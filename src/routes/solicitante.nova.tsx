@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
-import { gerarProtocolo, semestreAtual, store } from "@/lib/store";
+import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
@@ -16,6 +16,9 @@ export const Route = createFileRoute("/solicitante/nova")({
 });
 
 interface FormData {
+  tipo: "Solicitação" | "Correção";
+  protocoloOriginal: string;
+  descricaoCorrecao: string;
   cpf: string;
   siape: string;
   oabNumero: string;
@@ -28,6 +31,7 @@ interface FormData {
 }
 
 const empty: FormData = {
+  tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
   uf: "", unidade: "", chefiaId: "", formacao: "",
 };
@@ -62,7 +66,13 @@ function NovaSolicitacao() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [chefiaQuery, setChefiaQuery] = useState("");
   const [showChefiaList, setShowChefiaList] = useState(false);
-  const [submitted, setSubmitted] = useState<{ protocolo: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ protocolo: string; tipo: "Solicitação" | "Correção" } | null>(null);
+
+  const all = useSolicitacoes();
+  const aprovadasDoUsuario = useMemo(
+    () => all.filter((s) => s.solicitanteId === user?.id && s.status === "APROVADA" && s.tipoSolicitacao === "Solicitação"),
+    [all, user]
+  );
 
   const chefiasFiltradas = useMemo(
     () => CHEFIAS.filter((c) => c.nome.toLowerCase().includes(chefiaQuery.toLowerCase())),
@@ -77,6 +87,11 @@ function NovaSolicitacao() {
 
   const validateStep1 = () => {
     const e: typeof errors = {};
+    if (data.tipo === "Correção") {
+      if (!data.protocoloOriginal) e.protocoloOriginal = "Selecione o protocolo a ser corrigido.";
+      if (data.descricaoCorrecao.trim().length < 20)
+        e.descricaoCorrecao = "Descreva a correção solicitada (mínimo 20 caracteres).";
+    }
     if (!data.cpf) e.cpf = "Informe o CPF.";
     else if (!validateCPF(data.cpf)) e.cpf = "CPF inválido.";
     if (!data.siape.trim()) e.siape = "Informe a matrícula SIAPE.";
@@ -87,6 +102,25 @@ function NovaSolicitacao() {
     if (!data.chefiaId) e.chefiaId = "Selecione a chefia imediata.";
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const aplicarOriginal = (protocolo: string) => {
+    const orig = aprovadasDoUsuario.find((s) => s.protocolo === protocolo);
+    if (!orig) return;
+    setData((d) => ({
+      ...d,
+      protocoloOriginal: protocolo,
+      cpf: orig.cpf,
+      siape: orig.siape,
+      oabNumero: orig.oabNumero || "",
+      oabUf: orig.oabUf || "",
+      cargo: orig.cargo,
+      uf: orig.uf,
+      unidade: orig.unidade,
+      chefiaId: orig.chefiaId,
+      formacao: orig.formacao || "",
+    }));
+    setChefiaQuery(orig.chefiaNome);
   };
 
   const submit = () => {
@@ -112,12 +146,23 @@ function NovaSolicitacao() {
       chefiaId: chefia.id,
       chefiaNome: chefia.nome,
       formacao: data.formacao || undefined,
-      tipoSolicitacao: "Solicitação",
+      tipoSolicitacao: data.tipo,
+      protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
+      descricaoCorrecao: data.tipo === "Correção" ? data.descricaoCorrecao : undefined,
       status: "PENDENTE",
-      historico: [{ data: now, evento: "Solicitação criada", autor: user.nome }],
+      historico: [{
+        data: now,
+        evento: data.tipo === "Correção"
+          ? `Correção solicitada (referência: ${data.protocoloOriginal})`
+          : "Solicitação criada",
+        autor: user.nome,
+      }],
     });
-    toast.success("Solicitação enviada", { description: `Protocolo ${protocolo}` });
-    setSubmitted({ protocolo });
+    toast.success(
+      data.tipo === "Correção" ? "Correção enviada" : "Solicitação enviada",
+      { description: `Protocolo ${protocolo}` }
+    );
+    setSubmitted({ protocolo, tipo: data.tipo });
   };
 
   return (
@@ -175,6 +220,95 @@ function NovaSolicitacao() {
               noValidate
               className="grid gap-5 sm:grid-cols-2"
             >
+              <div className="sm:col-span-2 rounded-md border border-gov-blue/30 bg-[oklch(0.98_0.02_250)] p-4">
+                <div className="block text-sm font-semibold mb-2">
+                  Informe o tipo de Solicitação <span className="text-gov-red">*</span>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(["Solicitação", "Correção"] as const).map((opt) => (
+                    <label
+                      key={opt}
+                      className={`flex cursor-pointer items-start gap-3 rounded-md border-2 px-4 py-3 text-sm transition ${
+                        data.tipo === opt
+                          ? "border-gov-blue bg-card text-gov-blue-dark"
+                          : "border-border bg-card hover:bg-accent"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="tipo"
+                        checked={data.tipo === opt}
+                        onChange={() => {
+                          set("tipo", opt);
+                          if (opt === "Solicitação") {
+                            set("protocoloOriginal", "");
+                            set("descricaoCorrecao", "");
+                          }
+                        }}
+                        className="mt-0.5 accent-gov-blue"
+                      />
+                      <span>
+                        <span className="block font-semibold">{opt}</span>
+                        <span className="block text-xs text-muted-foreground">
+                          {opt === "Solicitação"
+                            ? "Registrar nova atividade de magistério no semestre."
+                            : "Corrigir dados de uma solicitação já aprovada."}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {data.tipo === "Correção" && (
+                <>
+                  <Field
+                    label="Protocolo a corrigir"
+                    required
+                    error={errors.protocoloOriginal}
+                    htmlFor="protorig"
+                    full
+                    hint="Apenas solicitações já aprovadas podem ser corrigidas."
+                  >
+                    <select
+                      id="protorig"
+                      value={data.protocoloOriginal}
+                      onChange={(e) => aplicarOriginal(e.target.value)}
+                      className={inputCls(!!errors.protocoloOriginal)}
+                    >
+                      <option value="">Selecione o protocolo original…</option>
+                      {aprovadasDoUsuario.map((s) => (
+                        <option key={s.id} value={s.protocolo}>
+                          {s.protocolo} — {s.semestre} — {s.unidade}
+                        </option>
+                      ))}
+                    </select>
+                    {aprovadasDoUsuario.length === 0 && (
+                      <p className="mt-1 text-xs text-gov-danger">
+                        Você ainda não possui solicitações aprovadas para corrigir.
+                      </p>
+                    )}
+                  </Field>
+                  <Field
+                    label="Descrição da correção"
+                    required
+                    error={errors.descricaoCorrecao}
+                    htmlFor="desccorr"
+                    full
+                    hint="Indique claramente o(s) campo(s) a corrigir e o valor correto."
+                  >
+                    <textarea
+                      id="desccorr"
+                      value={data.descricaoCorrecao}
+                      onChange={(e) => set("descricaoCorrecao", e.target.value)}
+                      rows={3}
+                      className={inputCls(!!errors.descricaoCorrecao)}
+                      placeholder="Ex.: Corrigir Unidade/Equipe para PGU/DF — Núcleo Cível."
+                    />
+                  </Field>
+                </>
+              )}
+
               <Field label="CPF" required error={errors.cpf} htmlFor="cpf">
                 <input
                   id="cpf"
@@ -337,7 +471,13 @@ function NovaSolicitacao() {
                 <Resumo label="CPF" value={data.cpf} />
                 <Resumo label="Matrícula SIAPE" value={data.siape} />
                 <Resumo label="OAB" value={[data.oabNumero, data.oabUf].filter(Boolean).join(" / ") || "—"} />
-                <Resumo label="Tipo de Solicitação" value="Solicitação" />
+                <Resumo label="Tipo de Solicitação" value={data.tipo} />
+                {data.tipo === "Correção" && (
+                  <>
+                    <Resumo label="Protocolo a corrigir" value={data.protocoloOriginal} />
+                    <Resumo label="Descrição da correção" value={data.descricaoCorrecao} full />
+                  </>
+                )}
                 <Resumo label="Cargo" value={data.cargo} full />
                 <Resumo label="UF" value={data.uf} />
                 <Resumo label="Unidade" value={data.unidade} />

@@ -31,7 +31,9 @@ export interface Solicitacao {
   chefiaId: string;
   chefiaNome: string;
   formacao?: string;
-  tipoSolicitacao: "Solicitação";
+  tipoSolicitacao: "Solicitação" | "Correção";
+  protocoloOriginal?: string;
+  descricaoCorrecao?: string;
   status: SolicitacaoStatus;
   decisaoComentario?: string;
   justificativaRecusa?: string;

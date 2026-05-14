@@ -81,8 +81,18 @@ function Analise() {
           <ArrowLeft className="h-4 w-4" /> Voltar
         </button>
 
-        <h1 className="font-display text-2xl mb-1">Análise da Solicitação</h1>
+        <h1 className="font-display text-2xl mb-1">
+          Análise de {s.tipoSolicitacao}
+        </h1>
         <p className="text-sm text-muted-foreground mb-6">Protocolo {s.protocolo} • {s.solicitanteNome}</p>
+
+        {s.tipoSolicitacao === "Correção" && (
+          <div className="mb-6">
+            <GovMessage tone="warning" title={`Correção referente ao protocolo ${s.protocoloOriginal ?? "—"}`}>
+              {s.descricaoCorrecao || "Sem descrição informada."}
+            </GovMessage>
+          </div>
+        )}
 
         <div className="gov-card mb-6">
           <h2 className="font-display text-lg mb-4">Dados do solicitante</h2>
