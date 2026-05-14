@@ -30,6 +30,7 @@ export interface Solicitacao {
   unidade: string;
   chefiaId: string;
   chefiaNome: string;
+  chefiaEmail?: string;
   formacao?: string;
   tipoSolicitacao: "Solicitação" | "Correção";
   protocoloOriginal?: string;
