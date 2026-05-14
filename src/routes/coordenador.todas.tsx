@@ -122,7 +122,7 @@ function Todas() {
                       Ver
                     </button>
                   </Td>
-                  <Td>{null}</Td>
+                  
                 </tr>
               ))}
             </tbody>
