@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
-import { gerarProtocolo, semestreAtual, store } from "@/lib/store";
+import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
