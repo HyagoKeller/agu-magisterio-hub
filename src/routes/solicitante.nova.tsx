@@ -6,6 +6,7 @@ import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
+import { dispatchNotification } from "@/lib/messaging-store";
 import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
@@ -75,7 +76,11 @@ function NovaSolicitacao() {
   );
 
   const chefiasFiltradas = useMemo(
-    () => CHEFIAS.filter((c) => c.nome.toLowerCase().includes(chefiaQuery.toLowerCase())),
+    () =>
+      CHEFIAS.filter((c) => {
+        const q = chefiaQuery.toLowerCase();
+        return c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
+      }),
     [chefiaQuery]
   );
   const chefiaSelecionada = CHEFIAS.find((c) => c.id === data.chefiaId);
