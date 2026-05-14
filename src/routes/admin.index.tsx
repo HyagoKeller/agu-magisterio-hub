@@ -36,8 +36,9 @@ function AdminHome() {
           <Card title="Última sincronização" value={ad.ultimaSincronizacao ? new Date(ad.ultimaSincronizacao).toLocaleString("pt-BR") : "Nunca"} icon={<Database className="h-5 w-5" />} sub={`A cada ${ad.intervaloSincronizacao} min`} />
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Quick to="/admin/ad" title="Configurar Active Directory" desc="Servidor, grupos, sincronização e SSL." />
+          <Quick to="/admin/mensageria" title="Configurar mensageria" desc="Google Workspace ou Microsoft 365 para alertas." />
           <Quick to="/admin/usuarios" title="Gerenciar usuários" desc="Vincular ao AD, alterar perfis e desativar contas." />
           <Quick to="/admin/acessos" title="Validar solicitações" desc="Aprovar ou recusar pedidos de acesso externo." />
         </div>

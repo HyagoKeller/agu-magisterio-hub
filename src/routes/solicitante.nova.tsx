@@ -6,6 +6,7 @@ import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
+import { dispatchNotification } from "@/lib/messaging-store";
 import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
@@ -75,7 +76,11 @@ function NovaSolicitacao() {
   );
 
   const chefiasFiltradas = useMemo(
-    () => CHEFIAS.filter((c) => c.nome.toLowerCase().includes(chefiaQuery.toLowerCase())),
+    () =>
+      CHEFIAS.filter((c) => {
+        const q = chefiaQuery.toLowerCase();
+        return c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
+      }),
     [chefiaQuery]
   );
   const chefiaSelecionada = CHEFIAS.find((c) => c.id === data.chefiaId);
@@ -162,6 +167,15 @@ function NovaSolicitacao() {
       data.tipo === "Correção" ? "Correção enviada" : "Solicitação enviada",
       { description: `Protocolo ${protocolo}` }
     );
+    dispatchNotification({
+      evento: "NOVA_SOLICITACAO",
+      destinatarios: [
+        { nome: user.nome, email: user.email },
+        { nome: chefia.nome, email: chefia.email },
+      ],
+      protocolo,
+      resumo: `${data.tipo} aberta por ${user.nome} (${data.unidade}) — chefia: ${chefia.nome}`,
+    });
     setSubmitted({ protocolo, tipo: data.tipo });
   };
 
@@ -392,12 +406,16 @@ function NovaSolicitacao() {
                 error={errors.chefiaId}
                 htmlFor="chefia"
                 full
-                hint="Caso não localize sua chefia, ligue 0800 608 4650"
+                hint="Busque pelo nome ou e-mail. Caso não localize, ligue 0800 608 4650."
               >
                 <div className="relative">
                   <input
                     id="chefia"
-                    value={chefiaSelecionada ? chefiaSelecionada.nome : chefiaQuery}
+                    value={
+                      chefiaSelecionada
+                        ? `${chefiaSelecionada.nome} — ${chefiaSelecionada.email}`
+                        : chefiaQuery
+                    }
                     onChange={(e) => {
                       set("chefiaId", "");
                       setChefiaQuery(e.target.value);
@@ -406,7 +424,7 @@ function NovaSolicitacao() {
                     onFocus={() => setShowChefiaList(true)}
                     onBlur={() => setTimeout(() => setShowChefiaList(false), 150)}
                     className={inputCls(!!errors.chefiaId)}
-                    placeholder="Buscar chefia…"
+                    placeholder="Buscar chefia por nome ou e-mail…"
                     autoComplete="off"
                   />
                   {showChefiaList && chefiasFiltradas.length > 0 && (
@@ -426,12 +444,18 @@ function NovaSolicitacao() {
                           }}
                           className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
                         >
-                          {c.nome}
+                          <div className="font-semibold text-foreground">{c.nome}</div>
+                          <div className="text-xs text-muted-foreground">{c.email}</div>
                         </li>
                       ))}
                     </ul>
                   )}
                 </div>
+                {chefiaSelecionada && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Notificação será enviada para <span className="font-semibold">{chefiaSelecionada.email}</span>
+                  </p>
+                )}
               </Field>
 
               <Field label="Formação Acadêmica mais elevada" htmlFor="formacao" full>

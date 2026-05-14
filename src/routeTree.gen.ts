@@ -26,6 +26,7 @@ import { Route as CoordenadorAcessosRouteImport } from './routes/coordenador.ace
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
 import { Route as AdminAdRouteImport } from './routes/admin.ad'
 import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
@@ -115,6 +116,11 @@ const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMensageriaRoute = AdminMensageriaRouteImport.update({
+  id: '/mensageria',
+  path: '/mensageria',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdRoute = AdminAdRouteImport.update({
   id: '/ad',
   path: '/ad',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/mensageria'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/mensageria'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/mensageria'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -388,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsuariosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/mensageria': {
+      id: '/admin/mensageria'
+      path: '/mensageria'
+      fullPath: '/admin/mensageria'
+      preLoaderRoute: typeof AdminMensageriaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ad': {
       id: '/admin/ad'
       path: '/ad'
@@ -415,6 +434,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAcessosRoute: typeof AdminAcessosRoute
   AdminAdRoute: typeof AdminAdRoute
+  AdminMensageriaRoute: typeof AdminMensageriaRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -422,6 +442,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAcessosRoute: AdminAcessosRoute,
   AdminAdRoute: AdminAdRoute,
+  AdminMensageriaRoute: AdminMensageriaRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
