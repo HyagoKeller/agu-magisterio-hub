@@ -7,18 +7,13 @@ interface Props {
 
 export function AguLogo({ size = 40, className = "" }: Props) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gov-blue shadow-sm ring-1 ring-gov-blue-dark/20 ${className}`}
+    <img
+      src={logo}
+      alt="Logotipo da Advocacia-Geral da União (AGU)"
+      width={size}
+      height={size}
+      className={`block shrink-0 rounded-xl shadow-sm ${className}`}
       style={{ width: size, height: size }}
-      aria-label="Logotipo da Advocacia-Geral da União (AGU)"
-      role="img"
-    >
-      <img
-        src={logo}
-        alt=""
-        className="h-full w-full object-contain"
-        style={{ padding: Math.max(2, Math.round(size * 0.08)) }}
-      />
-    </span>
+    />
   );
 }
