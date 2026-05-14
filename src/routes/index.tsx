@@ -57,56 +57,56 @@ function LoginPage() {
         />
 
         <div className="gov-container flex min-h-[calc(100vh-36px)] items-center justify-center py-12">
-          <div className="grid w-full max-w-6xl items-stretch gap-10 md:grid-cols-[1.05fr_1fr]">
-            {/* Painel institucional */}
-            <aside className="hidden md:flex flex-col justify-between rounded-2xl border border-gov-blue-dark/20 bg-gradient-to-br from-gov-blue-dark via-gov-blue to-gov-blue-dark p-10 text-white shadow-lg overflow-hidden relative">
-              <div
-                aria-hidden="true"
-                className="absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-20"
-                style={{ background: "radial-gradient(circle, var(--gov-yellow), transparent 70%)" }}
-              />
-              <div>
-                <div className="flex items-center gap-4">
-                  <AguLogo size={84} className="ring-2 ring-white/40" />
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
-                      Advocacia-Geral da União
-                    </div>
-                    <h1 className="font-display text-3xl leading-tight">Portal Magistério</h1>
+          <div className="grid w-full max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_1fr]">
+            {/* Painel institucional — claro, dentro do padrão gov.br */}
+            <aside className="hidden md:flex flex-col">
+              <div className="flex items-center gap-5">
+                <AguLogo size={92} />
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gov-blue">
+                    Advocacia-Geral da União
                   </div>
+                  <h1 className="font-display text-[2.25rem] leading-tight text-gov-blue-dark mt-1">
+                    Portal Magistério
+                  </h1>
+                  <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-gov-success via-gov-yellow to-gov-success" />
                 </div>
-
-                <p className="mt-8 text-base leading-relaxed text-white/90 max-w-md">
-                  Ambiente institucional para registro, análise e gestão de solicitações
-                  de magistério dos membros da AGU, integrado ao Active Directory institucional.
-                </p>
-
-                <ul className="mt-8 grid gap-3 text-sm">
-                  {[
-                    "Login único com credenciais do AD da AGU",
-                    "Perfis derivados de grupos institucionais",
-                    "Acesso externo mediante validação do RH ou Coordenação",
-                    "Recuperação por e-mail institucional ou pessoal",
-                  ].map((t) => (
-                    <li key={t} className="flex items-start gap-2.5">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gov-yellow" />
-                      <span className="text-white/95">{t}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              <div className="mt-10 flex items-center gap-3 border-t border-white/15 pt-5 text-xs text-white/75">
-                <span className="font-display font-semibold tracking-wide">gov.br</span>
+              <p className="mt-8 max-w-md text-base leading-relaxed text-foreground/80">
+                Ambiente institucional para registro, análise e gestão de
+                solicitações de magistério dos membros da AGU, integrado ao
+                Active Directory institucional.
+              </p>
+
+              <ul className="mt-8 grid gap-2.5 max-w-md">
+                {[
+                  "Login único com credenciais do AD da AGU",
+                  "Perfis derivados de grupos institucionais",
+                  "Acesso externo validado por RH ou Coordenação",
+                  "Recuperação por e-mail institucional ou pessoal",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm">
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gov-blue" />
+                    <span className="text-foreground/85">{t}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="font-display font-semibold tracking-wide text-gov-blue-dark">gov.br</span>
                 <span aria-hidden="true">·</span>
                 <span>Padrão Digital de Governo (DSGov)</span>
               </div>
             </aside>
 
             {/* Cartão de autenticação */}
-            <section className="rounded-2xl border border-border bg-card p-7 shadow-md md:p-8">
+            <section className="rounded-2xl border border-border bg-card p-7 shadow-[0_10px_30px_-15px_rgba(19,81,180,0.25)] md:p-8 relative overflow-hidden">
+              {/* Detalhe superior gov.br */}
+              <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-gov-success via-gov-yellow to-gov-success" />
+
               <div className="md:hidden mb-5 flex items-center gap-3">
-                <AguLogo size={48} />
+                <AguLogo size={52} />
                 <div>
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-gov-blue">Advocacia-Geral da União</div>
                   <h1 className="font-display text-xl text-gov-blue-dark">Portal Magistério</h1>
