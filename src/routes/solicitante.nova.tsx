@@ -80,16 +80,6 @@ function NovaSolicitacao() {
     [all, user]
   );
 
-  const chefiasFiltradas = useMemo(
-    () =>
-      CHEFIAS.filter((c) => {
-        const q = chefiaQuery.toLowerCase();
-        return c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
-      }),
-    [chefiaQuery]
-  );
-  const chefiaSelecionada = CHEFIAS.find((c) => c.id === data.chefiaId);
-
   const set = <K extends keyof FormData>(k: K, v: FormData[K]) => {
     setData((d) => ({ ...d, [k]: v }));
     setErrors((e) => ({ ...e, [k]: undefined }));
@@ -109,7 +99,10 @@ function NovaSolicitacao() {
     if (!data.cargo) e.cargo = "Selecione o cargo.";
     if (!data.uf) e.uf = "Selecione a UF.";
     if (!data.unidade.trim()) e.unidade = "Informe a unidade/equipe.";
-    if (!data.chefiaId) e.chefiaId = "Selecione a chefia imediata.";
+    if (!data.chefiaNome.trim() || data.chefiaNome.trim().length < 3)
+      e.chefiaNome = "Informe o nome completo da chefia imediata.";
+    if (!data.chefiaEmail.trim()) e.chefiaEmail = "Informe o e-mail da chefia imediata.";
+    else if (!isValidEmail(data.chefiaEmail)) e.chefiaEmail = "E-mail inválido.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -127,10 +120,10 @@ function NovaSolicitacao() {
       cargo: orig.cargo,
       uf: orig.uf,
       unidade: orig.unidade,
-      chefiaId: orig.chefiaId,
+      chefiaNome: orig.chefiaNome,
+      chefiaEmail: orig.chefiaEmail || "",
       formacao: orig.formacao || "",
     }));
-    setChefiaQuery(orig.chefiaNome);
   };
 
   const submit = () => {
@@ -138,7 +131,8 @@ function NovaSolicitacao() {
     const id = crypto.randomUUID();
     const protocolo = gerarProtocolo();
     const now = new Date().toISOString();
-    const chefia = CHEFIAS.find((c) => c.id === data.chefiaId)!;
+    const chefiaNome = data.chefiaNome.trim();
+    const chefiaEmail = data.chefiaEmail.trim().toLowerCase();
     store.add({
       id,
       protocolo,
@@ -153,8 +147,9 @@ function NovaSolicitacao() {
       cargo: data.cargo,
       uf: data.uf,
       unidade: data.unidade,
-      chefiaId: chefia.id,
-      chefiaNome: chefia.nome,
+      chefiaId: chefiaEmail,
+      chefiaNome,
+      chefiaEmail,
       formacao: data.formacao || undefined,
       tipoSolicitacao: data.tipo,
       protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
@@ -176,10 +171,10 @@ function NovaSolicitacao() {
       evento: "NOVA_SOLICITACAO",
       destinatarios: [
         { nome: user.nome, email: user.email },
-        { nome: chefia.nome, email: chefia.email },
+        { nome: chefiaNome, email: chefiaEmail },
       ],
       protocolo,
-      resumo: `${data.tipo} aberta por ${user.nome} (${data.unidade}) — chefia: ${chefia.nome}`,
+      resumo: `${data.tipo} aberta por ${user.nome} (${data.unidade}) — chefia: ${chefiaNome}`,
     });
     setSubmitted({ protocolo, tipo: data.tipo });
   };
