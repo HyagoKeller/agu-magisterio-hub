@@ -27,15 +27,20 @@ interface FormData {
   cargo: string;
   uf: string;
   unidade: string;
-  chefiaId: string;
+  chefiaNome: string;
+  chefiaEmail: string;
   formacao: string;
 }
 
 const empty: FormData = {
   tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
-  uf: "", unidade: "", chefiaId: "", formacao: "",
+  uf: "", unidade: "", chefiaNome: "", chefiaEmail: "", formacao: "",
 };
+
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+}
 
 function maskCPF(v: string) {
   return v.replace(/\D/g, "").slice(0, 11)
