@@ -34,45 +34,95 @@ function LoginPage() {
       {/* Faixa gov.br superior */}
       <div className="bg-gov-blue-dark text-white text-xs">
         <div className="gov-container grid h-8 grid-cols-3 items-center">
-          <a href="https://www.gov.br" className="font-display font-semibold justify-self-start">gov.br</a>
+          <a href="https://www.gov.br" className="font-display font-semibold justify-self-start hover:opacity-90">gov.br</a>
           <a href="https://aguservicos.agu.gov.br" target="_blank" rel="noreferrer" className="justify-self-center font-semibold hover:underline">
             Acesse já: aguservicos.agu.gov.br
           </a>
-          <span className="justify-self-end hidden sm:block">Advocacia-Geral da União</span>
+          <span className="justify-self-end hidden sm:block opacity-90">Advocacia-Geral da União</span>
         </div>
       </div>
 
-      <div className="gov-container flex min-h-[calc(100vh-32px)] items-center justify-center py-10">
-        <div className="grid w-full max-w-5xl items-center gap-10 md:grid-cols-2">
-          <div className="hidden md:block">
-            <div className="mb-6 flex items-center gap-4">
-              <AguLogo size={72} />
+      {/* Faixa decorativa verde/amarela gov.br */}
+      <div className="h-1 w-full bg-gradient-to-r from-gov-success via-gov-yellow to-gov-success" aria-hidden="true" />
+
+      <div className="relative">
+        {/* Fundo institucional sutil — dentro do padrão gov.br */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 15% 10%, color-mix(in oklab, var(--gov-blue) 12%, transparent), transparent 55%), radial-gradient(circle at 85% 90%, color-mix(in oklab, var(--gov-blue-dark) 10%, transparent), transparent 50%)",
+          }}
+        />
+
+        <div className="gov-container flex min-h-[calc(100vh-36px)] items-center justify-center py-12">
+          <div className="grid w-full max-w-6xl items-stretch gap-10 md:grid-cols-[1.05fr_1fr]">
+            {/* Painel institucional */}
+            <aside className="hidden md:flex flex-col justify-between rounded-2xl border border-gov-blue-dark/20 bg-gradient-to-br from-gov-blue-dark via-gov-blue to-gov-blue-dark p-10 text-white shadow-lg overflow-hidden relative">
+              <div
+                aria-hidden="true"
+                className="absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-20"
+                style={{ background: "radial-gradient(circle, var(--gov-yellow), transparent 70%)" }}
+              />
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-gov-blue">Advocacia-Geral da União</div>
-                <h1 className="font-display text-3xl text-gov-blue-dark">Portal Magistério</h1>
+                <div className="flex items-center gap-4">
+                  <AguLogo size={84} className="ring-2 ring-white/40" />
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
+                      Advocacia-Geral da União
+                    </div>
+                    <h1 className="font-display text-3xl leading-tight">Portal Magistério</h1>
+                  </div>
+                </div>
+
+                <p className="mt-8 text-base leading-relaxed text-white/90 max-w-md">
+                  Ambiente institucional para registro, análise e gestão de solicitações
+                  de magistério dos membros da AGU, integrado ao Active Directory institucional.
+                </p>
+
+                <ul className="mt-8 grid gap-3 text-sm">
+                  {[
+                    "Login único com credenciais do AD da AGU",
+                    "Perfis derivados de grupos institucionais",
+                    "Acesso externo mediante validação do RH ou Coordenação",
+                    "Recuperação por e-mail institucional ou pessoal",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-2.5">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gov-yellow" />
+                      <span className="text-white/95">{t}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-            <p className="text-base text-foreground/80 leading-relaxed">
-              Sistema institucional para registro, análise e gestão de solicitações de magistério, integrado ao Active Directory da AGU.
-            </p>
-            <ul className="mt-6 space-y-2 text-sm text-foreground/80">
-              <li className="flex gap-2"><span className="text-gov-blue">•</span> Login único com credenciais do AD da AGU</li>
-              <li className="flex gap-2"><span className="text-gov-blue">•</span> Perfis derivados de grupos do AD (Solicitantes, Chefia, Coordenação)</li>
-              <li className="flex gap-2"><span className="text-gov-blue">•</span> Acesso externo mediante validação do RH ou Coordenação</li>
-              <li className="flex gap-2"><span className="text-gov-blue">•</span> Recuperação de senha por e-mail institucional ou pessoal</li>
-            </ul>
-          </div>
 
-          <div className="gov-card shadow-sm">
-            <div className="flex gap-1 border-b border-border mb-4 -mt-2">
-              <TabBtn active={tab === "login"} onClick={() => setTab("login")} icon={<LogIn className="h-4 w-4" />}>Entrar</TabBtn>
-              <TabBtn active={tab === "solicitar"} onClick={() => setTab("solicitar")} icon={<UserPlus className="h-4 w-4" />}>Solicitar acesso</TabBtn>
-              <TabBtn active={tab === "recuperar"} onClick={() => setTab("recuperar")} icon={<KeyRound className="h-4 w-4" />}>Esqueci a senha</TabBtn>
-            </div>
+              <div className="mt-10 flex items-center gap-3 border-t border-white/15 pt-5 text-xs text-white/75">
+                <span className="font-display font-semibold tracking-wide">gov.br</span>
+                <span aria-hidden="true">·</span>
+                <span>Padrão Digital de Governo (DSGov)</span>
+              </div>
+            </aside>
 
-            {tab === "login" && <LoginForm onLogin={(r) => { login(r); navigate({ to: homeForRole(r) }); }} />}
-            {tab === "solicitar" && <SolicitarForm onDone={() => setTab("login")} />}
-            {tab === "recuperar" && <RecuperarForm />}
+            {/* Cartão de autenticação */}
+            <section className="rounded-2xl border border-border bg-card p-7 shadow-md md:p-8">
+              <div className="md:hidden mb-5 flex items-center gap-3">
+                <AguLogo size={48} />
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-gov-blue">Advocacia-Geral da União</div>
+                  <h1 className="font-display text-xl text-gov-blue-dark">Portal Magistério</h1>
+                </div>
+              </div>
+
+              <nav aria-label="Modos de acesso" className="flex gap-1 border-b border-border mb-5">
+                <TabBtn active={tab === "login"} onClick={() => setTab("login")} icon={<LogIn className="h-4 w-4" />}>Entrar</TabBtn>
+                <TabBtn active={tab === "solicitar"} onClick={() => setTab("solicitar")} icon={<UserPlus className="h-4 w-4" />}>Solicitar acesso</TabBtn>
+                <TabBtn active={tab === "recuperar"} onClick={() => setTab("recuperar")} icon={<KeyRound className="h-4 w-4" />}>Esqueci a senha</TabBtn>
+              </nav>
+
+              {tab === "login" && <LoginForm onLogin={(r) => { login(r); navigate({ to: homeForRole(r) }); }} />}
+              {tab === "solicitar" && <SolicitarForm onDone={() => setTab("login")} />}
+              {tab === "recuperar" && <RecuperarForm />}
+            </section>
           </div>
         </div>
       </div>
