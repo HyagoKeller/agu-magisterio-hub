@@ -123,25 +123,56 @@ function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
         <fieldset>
           <legend className="block text-sm font-semibold mb-2">Perfil de acesso (demonstração — em produção vem do AD)</legend>
           <div className="grid gap-2">
-            {(["SOLICITANTE", "CHEFIA", "COORDENADOR", "SUPERADMIN"] as Role[]).map((r) => (
-              <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2 text-sm ${perfil === r ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
+            {(["SOLICITANTE", "CHEFIA"] as Role[]).map((r) => (
+              <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ${perfil === r ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
                 <input type="radio" name="perfil" value={r} checked={perfil === r} onChange={() => setPerfil(r)} className="mt-0.5 accent-gov-blue" />
                 <span>
                   <span className="block font-semibold text-gov-blue-dark">
-                    {r === "SOLICITANTE" && "Solicitante (Membro AGU)"}
-                    {r === "CHEFIA" && "Chefia Imediata"}
-                    {r === "COORDENADOR" && "Coordenação CGU/AGU"}
-                    {r === "SUPERADMIN" && "Superadministrador (TI)"}
+                    {r === "SOLICITANTE" ? "Solicitante (Membro AGU)" : "Chefia Imediata"}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {r === "SOLICITANTE" && "Cria solicitações de magistério"}
-                    {r === "CHEFIA" && "Aprova ou recusa solicitações"}
-                    {r === "COORDENADOR" && "Acompanha indicadores e valida acessos"}
-                    {r === "SUPERADMIN" && "Configura AD, usuários e grupos"}
+                    {r === "SOLICITANTE" ? "Cria solicitações de magistério" : "Aprova ou recusa solicitações"}
                   </span>
                 </span>
               </label>
             ))}
+
+            {/* Gestão do Portal — agrupa Coordenação e Superadmin em select */}
+            {(() => {
+              const isGestao = perfil === "COORDENADOR" || perfil === "SUPERADMIN";
+              return (
+                <label className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ${isGestao ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
+                  <input
+                    type="radio"
+                    name="perfil"
+                    checked={isGestao}
+                    onChange={() => setPerfil("COORDENADOR")}
+                    className="mt-0.5 accent-gov-blue"
+                  />
+                  <span className="flex-1">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="block font-semibold text-gov-blue-dark">Gestão do Portal</span>
+                      <span className="text-[11px] uppercase tracking-wide text-gov-blue font-semibold">Acesso restrito</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground block mt-0.5">
+                      Coordenação CGU/AGU e Superadministrador (TI).
+                    </span>
+                    {isGestao && (
+                      <select
+                        value={perfil}
+                        onChange={(e) => setPerfil(e.target.value as Role)}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="Selecione o perfil de gestão"
+                        className="mt-2 w-full rounded-md border border-input bg-card px-2.5 py-1.5 text-sm text-foreground focus:border-gov-blue"
+                      >
+                        <option value="COORDENADOR">Coordenação CGU/AGU — indicadores e validações</option>
+                        <option value="SUPERADMIN">Superadministrador (TI) — AD, usuários e grupos</option>
+                      </select>
+                    )}
+                  </span>
+                </label>
+              );
+            })()}
           </div>
         </fieldset>
 
