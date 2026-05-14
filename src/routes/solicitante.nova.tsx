@@ -16,6 +16,9 @@ export const Route = createFileRoute("/solicitante/nova")({
 });
 
 interface FormData {
+  tipo: "Solicitação" | "Correção";
+  protocoloOriginal: string;
+  descricaoCorrecao: string;
   cpf: string;
   siape: string;
   oabNumero: string;
@@ -28,6 +31,7 @@ interface FormData {
 }
 
 const empty: FormData = {
+  tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
   uf: "", unidade: "", chefiaId: "", formacao: "",
 };
