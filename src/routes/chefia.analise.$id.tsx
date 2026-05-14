@@ -7,6 +7,8 @@ import { GovMessage } from "@/components/GovMessage";
 import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
+import { dispatchNotification } from "@/lib/messaging-store";
+import { CHEFIAS } from "@/lib/types";
 
 export const Route = createFileRoute("/chefia/analise/$id")({
   head: () => ({ meta: [{ title: "Analisar Solicitação — Portal Magistério AGU" }] }),
@@ -47,14 +49,31 @@ function Analise() {
 
   const confirmar = () => {
     if (!user) return;
+    const chefiaInfo = CHEFIAS.find((c) => c.id === s.chefiaId);
+    const destinatarios = [
+      { nome: s.solicitanteNome, email: `${s.solicitanteNome.toLowerCase().replace(/\s+/g, ".")}@agu.gov.br` },
+      ...(chefiaInfo ? [{ nome: chefiaInfo.nome, email: chefiaInfo.email }] : []),
+    ];
     if (decisao === "APROVAR") {
       store.decide(s.id, "APROVADA", user.nome, comentario || undefined);
+      dispatchNotification({
+        evento: "DECISAO_APROVADA",
+        destinatarios,
+        protocolo: s.protocolo,
+        resumo: `Solicitação ${s.protocolo} aprovada por ${user.nome}.`,
+      });
       toast.success("Solicitação aprovada", {
         description: "O solicitante será notificado por e-mail.",
         icon: <Mail className="h-4 w-4" />,
       });
     } else {
       store.decide(s.id, "RECUSADA", user.nome, undefined, justificativa);
+      dispatchNotification({
+        evento: "DECISAO_RECUSADA",
+        destinatarios,
+        protocolo: s.protocolo,
+        resumo: `Solicitação ${s.protocolo} recusada por ${user.nome}. Motivo: ${justificativa}`,
+      });
       toast.success("Solicitação recusada", {
         description: "O processo foi encerrado e o solicitante notificado.",
       });
