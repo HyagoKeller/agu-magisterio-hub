@@ -59,45 +59,25 @@ function LoginPage() {
         <div className="gov-container flex min-h-[calc(100vh-36px)] items-center justify-center py-12">
           <div className="grid w-full max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_1fr]">
             {/* Painel institucional — claro, dentro do padrão gov.br */}
-            <aside className="hidden md:flex flex-col">
-              <div className="flex items-center gap-5">
-                <AguLogo size={92} />
+            <aside className="hidden md:flex flex-col items-start">
+              <div className="flex items-center gap-6">
+                <AguLogo size={120} />
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gov-blue">
+                  <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gov-blue">
                     Advocacia-Geral da União
                   </div>
-                  <h1 className="font-display text-[2.25rem] leading-tight text-gov-blue-dark mt-1">
+                  <h1 className="font-display text-[2.75rem] leading-tight text-gov-blue-dark mt-1.5">
                     Portal Magistério
                   </h1>
-                  <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-gov-success via-gov-yellow to-gov-success" />
+                  <div className="mt-3 h-1 w-20 rounded-full bg-gradient-to-r from-gov-success via-gov-yellow to-gov-success" />
                 </div>
               </div>
 
-              <p className="mt-8 max-w-md text-base leading-relaxed text-foreground/80">
+              <p className="mt-10 max-w-md text-base leading-relaxed text-foreground/80">
                 Ambiente institucional para registro, análise e gestão de
                 solicitações de magistério dos membros da AGU, integrado ao
                 Active Directory institucional.
               </p>
-
-              <ul className="mt-8 grid gap-2.5 max-w-md">
-                {[
-                  "Login único com credenciais do AD da AGU",
-                  "Perfis derivados de grupos institucionais",
-                  "Acesso externo validado por RH ou Coordenação",
-                  "Recuperação por e-mail institucional ou pessoal",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gov-blue" />
-                    <span className="text-foreground/85">{t}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-10 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="font-display font-semibold tracking-wide text-gov-blue-dark">gov.br</span>
-                <span aria-hidden="true">·</span>
-                <span>Padrão Digital de Governo (DSGov)</span>
-              </div>
             </aside>
 
             {/* Cartão de autenticação */}
