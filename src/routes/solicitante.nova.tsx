@@ -7,7 +7,7 @@ import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
+import { CARGOS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
