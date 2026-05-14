@@ -31,6 +31,7 @@ function Pendentes() {
             <thead>
               <tr className="border-b border-border bg-muted/50 text-left">
                 <Th>Protocolo</Th>
+                <Th>Tipo</Th>
                 <Th>Solicitante</Th>
                 <Th>Cargo</Th>
                 <Th>Unidade/UF</Th>
@@ -40,13 +41,22 @@ function Pendentes() {
             </thead>
             <tbody>
               {list.length === 0 && (
-                <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">
+                <tr><td colSpan={7} className="py-6 text-center text-muted-foreground">
                   Sem pendências no momento. Bom trabalho!
                 </td></tr>
               )}
               {list.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted/30">
                   <Td><span className="font-semibold text-gov-blue-dark">{s.protocolo}</span></Td>
+                  <Td>
+                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      s.tipoSolicitacao === "Correção"
+                        ? "bg-[oklch(0.95_0.08_75)] text-[oklch(0.45_0.15_60)]"
+                        : "bg-[oklch(0.95_0.04_250)] text-gov-blue-dark"
+                    }`}>
+                      {s.tipoSolicitacao}
+                    </span>
+                  </Td>
                   <Td>{s.solicitanteNome}</Td>
                   <Td>{s.cargo}</Td>
                   <Td>{s.unidade} / {s.uf}</Td>
