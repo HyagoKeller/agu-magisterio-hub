@@ -10,12 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolicitanteRouteImport } from './routes/solicitante'
+import { Route as CoordenadorRouteImport } from './routes/coordenador'
 import { Route as ChefiaRouteImport } from './routes/chefia'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitanteIndexRouteImport } from './routes/solicitante.index'
+import { Route as CoordenadorIndexRouteImport } from './routes/coordenador.index'
 import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
+import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
+import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
@@ -23,6 +27,11 @@ import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id
 const SolicitanteRoute = SolicitanteRouteImport.update({
   id: '/solicitante',
   path: '/solicitante',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoordenadorRoute = CoordenadorRouteImport.update({
+  id: '/coordenador',
+  path: '/coordenador',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChefiaRoute = ChefiaRouteImport.update({
@@ -40,6 +49,11 @@ const SolicitanteIndexRoute = SolicitanteIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SolicitanteRoute,
 } as any)
+const CoordenadorIndexRoute = CoordenadorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CoordenadorRoute,
+} as any)
 const ChefiaIndexRoute = ChefiaIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -54,6 +68,16 @@ const SolicitanteMinhasRoute = SolicitanteMinhasRouteImport.update({
   id: '/minhas',
   path: '/minhas',
   getParentRoute: () => SolicitanteRoute,
+} as any)
+const CoordenadorTodasRoute = CoordenadorTodasRouteImport.update({
+  id: '/todas',
+  path: '/todas',
+  getParentRoute: () => CoordenadorRoute,
+} as any)
+const CoordenadorRelatoriosRoute = CoordenadorRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => CoordenadorRoute,
 } as any)
 const ChefiaPendentesRoute = ChefiaPendentesRouteImport.update({
   id: '/pendentes',
@@ -74,12 +98,16 @@ const ChefiaAnaliseIdRoute = ChefiaAnaliseIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chefia': typeof ChefiaRouteWithChildren
+  '/coordenador': typeof CoordenadorRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
+  '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/chefia/': typeof ChefiaIndexRoute
+  '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
@@ -87,9 +115,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
+  '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/chefia': typeof ChefiaIndexRoute
+  '/coordenador': typeof CoordenadorIndexRoute
   '/solicitante': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
@@ -97,12 +128,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/chefia': typeof ChefiaRouteWithChildren
+  '/coordenador': typeof CoordenadorRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
+  '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/chefia/': typeof ChefiaIndexRoute
+  '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
@@ -111,12 +146,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/chefia'
+    | '/coordenador'
     | '/solicitante'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/relatorios'
+    | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/chefia/'
+    | '/coordenador/'
     | '/solicitante/'
     | '/chefia/analise/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -124,21 +163,28 @@ export interface FileRouteTypes {
     | '/'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/relatorios'
+    | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/chefia'
+    | '/coordenador'
     | '/solicitante'
     | '/chefia/analise/$id'
   id:
     | '__root__'
     | '/'
     | '/chefia'
+    | '/coordenador'
     | '/solicitante'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/relatorios'
+    | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/chefia/'
+    | '/coordenador/'
     | '/solicitante/'
     | '/chefia/analise/$id'
   fileRoutesById: FileRoutesById
@@ -146,6 +192,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChefiaRoute: typeof ChefiaRouteWithChildren
+  CoordenadorRoute: typeof CoordenadorRouteWithChildren
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
 }
 
@@ -156,6 +203,13 @@ declare module '@tanstack/react-router' {
       path: '/solicitante'
       fullPath: '/solicitante'
       preLoaderRoute: typeof SolicitanteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coordenador': {
+      id: '/coordenador'
+      path: '/coordenador'
+      fullPath: '/coordenador'
+      preLoaderRoute: typeof CoordenadorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chefia': {
@@ -179,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitanteIndexRouteImport
       parentRoute: typeof SolicitanteRoute
     }
+    '/coordenador/': {
+      id: '/coordenador/'
+      path: '/'
+      fullPath: '/coordenador/'
+      preLoaderRoute: typeof CoordenadorIndexRouteImport
+      parentRoute: typeof CoordenadorRoute
+    }
     '/chefia/': {
       id: '/chefia/'
       path: '/'
@@ -199,6 +260,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/solicitante/minhas'
       preLoaderRoute: typeof SolicitanteMinhasRouteImport
       parentRoute: typeof SolicitanteRoute
+    }
+    '/coordenador/todas': {
+      id: '/coordenador/todas'
+      path: '/todas'
+      fullPath: '/coordenador/todas'
+      preLoaderRoute: typeof CoordenadorTodasRouteImport
+      parentRoute: typeof CoordenadorRoute
+    }
+    '/coordenador/relatorios': {
+      id: '/coordenador/relatorios'
+      path: '/relatorios'
+      fullPath: '/coordenador/relatorios'
+      preLoaderRoute: typeof CoordenadorRelatoriosRouteImport
+      parentRoute: typeof CoordenadorRoute
     }
     '/chefia/pendentes': {
       id: '/chefia/pendentes'
@@ -241,6 +316,22 @@ const ChefiaRouteChildren: ChefiaRouteChildren = {
 const ChefiaRouteWithChildren =
   ChefiaRoute._addFileChildren(ChefiaRouteChildren)
 
+interface CoordenadorRouteChildren {
+  CoordenadorRelatoriosRoute: typeof CoordenadorRelatoriosRoute
+  CoordenadorTodasRoute: typeof CoordenadorTodasRoute
+  CoordenadorIndexRoute: typeof CoordenadorIndexRoute
+}
+
+const CoordenadorRouteChildren: CoordenadorRouteChildren = {
+  CoordenadorRelatoriosRoute: CoordenadorRelatoriosRoute,
+  CoordenadorTodasRoute: CoordenadorTodasRoute,
+  CoordenadorIndexRoute: CoordenadorIndexRoute,
+}
+
+const CoordenadorRouteWithChildren = CoordenadorRoute._addFileChildren(
+  CoordenadorRouteChildren,
+)
+
 interface SolicitanteRouteChildren {
   SolicitanteMinhasRoute: typeof SolicitanteMinhasRoute
   SolicitanteNovaRoute: typeof SolicitanteNovaRoute
@@ -260,6 +351,7 @@ const SolicitanteRouteWithChildren = SolicitanteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChefiaRoute: ChefiaRouteWithChildren,
+  CoordenadorRoute: CoordenadorRouteWithChildren,
   SolicitanteRoute: SolicitanteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
