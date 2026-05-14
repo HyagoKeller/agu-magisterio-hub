@@ -483,7 +483,7 @@ function NovaSolicitacao() {
                 <Resumo label="Cargo" value={data.cargo} full />
                 <Resumo label="UF" value={data.uf} />
                 <Resumo label="Unidade" value={data.unidade} />
-                <Resumo label="Chefia Imediata" value={chefiaSelecionada?.nome ?? "—"} full />
+                <Resumo label="Chefia Imediata" value={`${data.chefiaNome}${data.chefiaEmail ? ` — ${data.chefiaEmail}` : ""}`} full />
                 <Resumo label="Formação" value={data.formacao || "—"} />
               </dl>
 
