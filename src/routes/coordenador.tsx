@@ -24,6 +24,7 @@ function CoordLayout() {
         nav={[
           { to: "/coordenador", label: "Dashboard" },
           { to: "/coordenador/todas", label: "Todas as Solicitações" },
+          { to: "/coordenador/acessos", label: "Solicitações de Acesso" },
           { to: "/coordenador/relatorios", label: "Relatórios" },
         ]}
       />

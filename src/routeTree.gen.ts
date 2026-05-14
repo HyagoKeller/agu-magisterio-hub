@@ -12,16 +12,22 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolicitanteRouteImport } from './routes/solicitante'
 import { Route as CoordenadorRouteImport } from './routes/coordenador'
 import { Route as ChefiaRouteImport } from './routes/chefia'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitanteIndexRouteImport } from './routes/solicitante.index'
 import { Route as CoordenadorIndexRouteImport } from './routes/coordenador.index'
 import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
 import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
 import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
+import { Route as CoordenadorAcessosRouteImport } from './routes/coordenador.acessos'
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as AdminAdRouteImport } from './routes/admin.ad'
+import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
 
 const SolicitanteRoute = SolicitanteRouteImport.update({
@@ -37,6 +43,11 @@ const CoordenadorRoute = CoordenadorRouteImport.update({
 const ChefiaRoute = ChefiaRouteImport.update({
   id: '/chefia',
   path: '/chefia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +70,11 @@ const ChefiaIndexRoute = ChefiaIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ChefiaRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const SolicitanteNovaRoute = SolicitanteNovaRouteImport.update({
   id: '/nova',
   path: '/nova',
@@ -79,6 +95,11 @@ const CoordenadorRelatoriosRoute = CoordenadorRelatoriosRouteImport.update({
   path: '/relatorios',
   getParentRoute: () => CoordenadorRoute,
 } as any)
+const CoordenadorAcessosRoute = CoordenadorAcessosRouteImport.update({
+  id: '/acessos',
+  path: '/acessos',
+  getParentRoute: () => CoordenadorRoute,
+} as any)
 const ChefiaPendentesRoute = ChefiaPendentesRouteImport.update({
   id: '/pendentes',
   path: '/pendentes',
@@ -89,6 +110,21 @@ const ChefiaHistoricoRoute = ChefiaHistoricoRouteImport.update({
   path: '/historico',
   getParentRoute: () => ChefiaRoute,
 } as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdRoute = AdminAdRouteImport.update({
+  id: '/ad',
+  path: '/ad',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAcessosRoute = AdminAcessosRouteImport.update({
+  id: '/acessos',
+  path: '/acessos',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ChefiaAnaliseIdRoute = ChefiaAnaliseIdRouteImport.update({
   id: '/analise/$id',
   path: '/analise/$id',
@@ -97,15 +133,21 @@ const ChefiaAnaliseIdRoute = ChefiaAnaliseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/chefia': typeof ChefiaRouteWithChildren
   '/coordenador': typeof CoordenadorRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
+  '/admin/acessos': typeof AdminAcessosRoute
+  '/admin/ad': typeof AdminAdRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/acessos': typeof CoordenadorAcessosRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/admin/': typeof AdminIndexRoute
   '/chefia/': typeof ChefiaIndexRoute
   '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
@@ -113,12 +155,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/acessos': typeof AdminAcessosRoute
+  '/admin/ad': typeof AdminAdRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/acessos': typeof CoordenadorAcessosRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/admin': typeof AdminIndexRoute
   '/chefia': typeof ChefiaIndexRoute
   '/coordenador': typeof CoordenadorIndexRoute
   '/solicitante': typeof SolicitanteIndexRoute
@@ -127,15 +174,21 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/chefia': typeof ChefiaRouteWithChildren
   '/coordenador': typeof CoordenadorRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
+  '/admin/acessos': typeof AdminAcessosRoute
+  '/admin/ad': typeof AdminAdRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/coordenador/acessos': typeof CoordenadorAcessosRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/admin/': typeof AdminIndexRoute
   '/chefia/': typeof ChefiaIndexRoute
   '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
@@ -145,15 +198,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/chefia'
     | '/coordenador'
     | '/solicitante'
+    | '/admin/acessos'
+    | '/admin/ad'
+    | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/acessos'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
+    | '/admin/'
     | '/chefia/'
     | '/coordenador/'
     | '/solicitante/'
@@ -161,12 +220,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/acessos'
+    | '/admin/ad'
+    | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/acessos'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
+    | '/admin'
     | '/chefia'
     | '/coordenador'
     | '/solicitante'
@@ -174,15 +238,21 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/chefia'
     | '/coordenador'
     | '/solicitante'
+    | '/admin/acessos'
+    | '/admin/ad'
+    | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/coordenador/acessos'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
     | '/solicitante/nova'
+    | '/admin/'
     | '/chefia/'
     | '/coordenador/'
     | '/solicitante/'
@@ -191,6 +261,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ChefiaRoute: typeof ChefiaRouteWithChildren
   CoordenadorRoute: typeof CoordenadorRouteWithChildren
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
@@ -217,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/chefia'
       fullPath: '/chefia'
       preLoaderRoute: typeof ChefiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -247,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChefiaIndexRouteImport
       parentRoute: typeof ChefiaRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/solicitante/nova': {
       id: '/solicitante/nova'
       path: '/nova'
@@ -275,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoordenadorRelatoriosRouteImport
       parentRoute: typeof CoordenadorRoute
     }
+    '/coordenador/acessos': {
+      id: '/coordenador/acessos'
+      path: '/acessos'
+      fullPath: '/coordenador/acessos'
+      preLoaderRoute: typeof CoordenadorAcessosRouteImport
+      parentRoute: typeof CoordenadorRoute
+    }
     '/chefia/pendentes': {
       id: '/chefia/pendentes'
       path: '/pendentes'
@@ -289,6 +381,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChefiaHistoricoRouteImport
       parentRoute: typeof ChefiaRoute
     }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ad': {
+      id: '/admin/ad'
+      path: '/ad'
+      fullPath: '/admin/ad'
+      preLoaderRoute: typeof AdminAdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/acessos': {
+      id: '/admin/acessos'
+      path: '/acessos'
+      fullPath: '/admin/acessos'
+      preLoaderRoute: typeof AdminAcessosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/chefia/analise/$id': {
       id: '/chefia/analise/$id'
       path: '/analise/$id'
@@ -298,6 +411,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAcessosRoute: typeof AdminAcessosRoute
+  AdminAdRoute: typeof AdminAdRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAcessosRoute: AdminAcessosRoute,
+  AdminAdRoute: AdminAdRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ChefiaRouteChildren {
   ChefiaHistoricoRoute: typeof ChefiaHistoricoRoute
@@ -317,12 +446,14 @@ const ChefiaRouteWithChildren =
   ChefiaRoute._addFileChildren(ChefiaRouteChildren)
 
 interface CoordenadorRouteChildren {
+  CoordenadorAcessosRoute: typeof CoordenadorAcessosRoute
   CoordenadorRelatoriosRoute: typeof CoordenadorRelatoriosRoute
   CoordenadorTodasRoute: typeof CoordenadorTodasRoute
   CoordenadorIndexRoute: typeof CoordenadorIndexRoute
 }
 
 const CoordenadorRouteChildren: CoordenadorRouteChildren = {
+  CoordenadorAcessosRoute: CoordenadorAcessosRoute,
   CoordenadorRelatoriosRoute: CoordenadorRelatoriosRoute,
   CoordenadorTodasRoute: CoordenadorTodasRoute,
   CoordenadorIndexRoute: CoordenadorIndexRoute,
@@ -350,6 +481,7 @@ const SolicitanteRouteWithChildren = SolicitanteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ChefiaRoute: ChefiaRouteWithChildren,
   CoordenadorRoute: CoordenadorRouteWithChildren,
   SolicitanteRoute: SolicitanteRouteWithChildren,
@@ -357,3 +489,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
