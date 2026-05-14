@@ -1,4 +1,4 @@
-export type Role = "SOLICITANTE" | "CHEFIA" | "COORDENADOR";
+export type Role = "SOLICITANTE" | "CHEFIA" | "COORDENADOR" | "SUPERADMIN";
 
 export type SolicitacaoStatus = "PENDENTE" | "APROVADA" | "RECUSADA";
 
@@ -8,6 +8,9 @@ export interface User {
   email: string;
   role: Role;
   matricula?: string;
+  emailPessoal?: string;
+  origem?: "AD" | "MANUAL";
+  ativo?: boolean;
 }
 
 export interface Solicitacao {
@@ -16,7 +19,6 @@ export interface Solicitacao {
   semestre: string;
   dataAbertura: string;
   dataDecisao?: string;
-  // Solicitante
   solicitanteId: string;
   solicitanteNome: string;
   cpf: string;
@@ -30,11 +32,9 @@ export interface Solicitacao {
   chefiaNome: string;
   formacao?: string;
   tipoSolicitacao: "Solicitação";
-  // Decisão
   status: SolicitacaoStatus;
   decisaoComentario?: string;
   justificativaRecusa?: string;
-  // Histórico
   historico: HistoricoEvento[];
 }
 
@@ -42,6 +42,43 @@ export interface HistoricoEvento {
   data: string;
   evento: string;
   autor: string;
+}
+
+export type AccessRequestStatus = "PENDENTE" | "APROVADO" | "RECUSADO";
+
+export interface AccessRequest {
+  id: string;
+  nome: string;
+  cpf: string;
+  emailPessoal: string;
+  emailInstitucional?: string;
+  cargoPretendido: string;
+  perfilSolicitado: Role;
+  unidade?: string;
+  justificativa: string;
+  dataSolicitacao: string;
+  status: AccessRequestStatus;
+  validadoPor?: string;
+  dataValidacao?: string;
+  motivoRecusa?: string;
+}
+
+export interface ADConfig {
+  habilitado: boolean;
+  servidor: string;
+  porta: number;
+  baseDN: string;
+  bindDN: string;
+  bindPassword: string;
+  usarSSL: boolean;
+  dominio: string;
+  grupoSolicitantes: string;
+  grupoChefia: string;
+  grupoCoordenacao: string;
+  grupoSuperadmin: string;
+  sincronizacaoAutomatica: boolean;
+  intervaloSincronizacao: number; // minutos
+  ultimaSincronizacao?: string;
 }
 
 export const CARGOS = [

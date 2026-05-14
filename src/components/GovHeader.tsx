@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { AguLogo } from "./AguLogo";
 
 interface NavItem {
   to: string;
@@ -26,20 +27,26 @@ export function GovHeader({ perfilLabel, nav, unread = 0, rightAction }: GovHead
     <header className="border-b border-border bg-card">
       {/* Faixa gov.br */}
       <div className="bg-gov-blue-dark text-white text-xs">
-        <div className="gov-container flex h-7 items-center justify-between">
-          <a href="https://www.gov.br" className="font-display font-semibold tracking-wide">
+        <div className="gov-container grid h-8 grid-cols-3 items-center">
+          <a href="https://www.gov.br" className="font-display font-semibold tracking-wide justify-self-start">
             gov.br
           </a>
-          <span className="opacity-80">Advocacia-Geral da União</span>
+          <a
+            href="https://aguservicos.agu.gov.br"
+            target="_blank"
+            rel="noreferrer"
+            className="justify-self-center font-semibold hover:underline"
+          >
+            Acesse já: aguservicos.agu.gov.br
+          </a>
+          <span className="opacity-80 justify-self-end hidden sm:block">Advocacia-Geral da União</span>
         </div>
       </div>
 
       {/* Cabeçalho principal */}
       <div className="gov-container flex items-center justify-between gap-4 py-4">
         <Link to="/" className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-gov-blue text-white font-display font-bold">
-            AGU
-          </div>
+          <AguLogo size={44} />
           <div className="min-w-0">
             <div className="font-display text-base font-semibold leading-tight text-gov-blue-dark truncate">
               Portal Magistério AGU
