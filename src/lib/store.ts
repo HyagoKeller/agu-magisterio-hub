@@ -202,6 +202,27 @@ function seed(): Solicitacao[] {
         { data: "2025-05-03T17:30:00Z", evento: "Solicitação aprovada pela chefia", autor: "Dra. Patrícia Mendes" },
       ],
     },
+    {
+      semestre: "2025.2",
+      dataAbertura: "2025-05-10T13:20:00Z",
+      solicitanteId: "u1",
+      solicitanteNome: "João Pereira da Silva",
+      cpf: "123.456.789-00",
+      siape: "1234567",
+      cargo: "Advogado(a) da União",
+      uf: "DF",
+      unidade: "PGU/DF - Núcleo Tributário",
+      chefiaId: "ch1",
+      chefiaNome: "Dra. Maria Helena Souza",
+      formacao: "Mestrado",
+      tipoSolicitacao: "Correção",
+      protocoloOriginal: "AGU-2025-100000",
+      descricaoCorrecao: "Corrigir Unidade/Equipe para PGU/DF — Núcleo Cível, conforme nova lotação a partir de maio/2025.",
+      status: "PENDENTE",
+      historico: [
+        { data: "2025-05-10T13:20:00Z", evento: "Correção solicitada (referência: AGU-2025-100000)", autor: "João Pereira da Silva" },
+      ],
+    },
   ];
   return base.map((s, i) => ({
     ...s,
