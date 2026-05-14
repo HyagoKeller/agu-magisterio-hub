@@ -95,7 +95,7 @@ function Todas() {
               <tr className="border-b border-border bg-muted/50 text-left">
                 <Th>Protocolo</Th><Th>Solicitante</Th><Th>CPF</Th><Th>Cargo</Th>
                 <Th>UF</Th><Th>Chefia</Th><Th>Status</Th>
-                <Th>Abertura</Th><Th>Decisão</Th><Th></Th>
+                <Th>Abertura</Th><Th>Decisão</Th><Th>Ações</Th>
               </tr>
             </thead>
             <tbody>
