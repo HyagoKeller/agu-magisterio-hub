@@ -66,7 +66,13 @@ function NovaSolicitacao() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [chefiaQuery, setChefiaQuery] = useState("");
   const [showChefiaList, setShowChefiaList] = useState(false);
-  const [submitted, setSubmitted] = useState<{ protocolo: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ protocolo: string; tipo: "Solicitação" | "Correção" } | null>(null);
+
+  const all = useSolicitacoes();
+  const aprovadasDoUsuario = useMemo(
+    () => all.filter((s) => s.solicitanteId === user?.id && s.status === "APROVADA" && s.tipoSolicitacao === "Solicitação"),
+    [all, user]
+  );
 
   const chefiasFiltradas = useMemo(
     () => CHEFIAS.filter((c) => c.nome.toLowerCase().includes(chefiaQuery.toLowerCase())),
