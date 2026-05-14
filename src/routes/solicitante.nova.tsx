@@ -87,6 +87,11 @@ function NovaSolicitacao() {
 
   const validateStep1 = () => {
     const e: typeof errors = {};
+    if (data.tipo === "Correção") {
+      if (!data.protocoloOriginal) e.protocoloOriginal = "Selecione o protocolo a ser corrigido.";
+      if (data.descricaoCorrecao.trim().length < 20)
+        e.descricaoCorrecao = "Descreva a correção solicitada (mínimo 20 caracteres).";
+    }
     if (!data.cpf) e.cpf = "Informe o CPF.";
     else if (!validateCPF(data.cpf)) e.cpf = "CPF inválido.";
     if (!data.siape.trim()) e.siape = "Informe a matrícula SIAPE.";
@@ -97,6 +102,25 @@ function NovaSolicitacao() {
     if (!data.chefiaId) e.chefiaId = "Selecione a chefia imediata.";
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const aplicarOriginal = (protocolo: string) => {
+    const orig = aprovadasDoUsuario.find((s) => s.protocolo === protocolo);
+    if (!orig) return;
+    setData((d) => ({
+      ...d,
+      protocoloOriginal: protocolo,
+      cpf: orig.cpf,
+      siape: orig.siape,
+      oabNumero: orig.oabNumero || "",
+      oabUf: orig.oabUf || "",
+      cargo: orig.cargo,
+      uf: orig.uf,
+      unidade: orig.unidade,
+      chefiaId: orig.chefiaId,
+      formacao: orig.formacao || "",
+    }));
+    setChefiaQuery(orig.chefiaNome);
   };
 
   const submit = () => {
@@ -122,12 +146,23 @@ function NovaSolicitacao() {
       chefiaId: chefia.id,
       chefiaNome: chefia.nome,
       formacao: data.formacao || undefined,
-      tipoSolicitacao: "Solicitação",
+      tipoSolicitacao: data.tipo,
+      protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
+      descricaoCorrecao: data.tipo === "Correção" ? data.descricaoCorrecao : undefined,
       status: "PENDENTE",
-      historico: [{ data: now, evento: "Solicitação criada", autor: user.nome }],
+      historico: [{
+        data: now,
+        evento: data.tipo === "Correção"
+          ? `Correção solicitada (referência: ${data.protocoloOriginal})`
+          : "Solicitação criada",
+        autor: user.nome,
+      }],
     });
-    toast.success("Solicitação enviada", { description: `Protocolo ${protocolo}` });
-    setSubmitted({ protocolo });
+    toast.success(
+      data.tipo === "Correção" ? "Correção enviada" : "Solicitação enviada",
+      { description: `Protocolo ${protocolo}` }
+    );
+    setSubmitted({ protocolo, tipo: data.tipo });
   };
 
   return (
