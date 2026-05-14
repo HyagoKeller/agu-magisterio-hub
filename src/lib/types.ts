@@ -99,9 +99,30 @@ export const UFS = [
 export const FORMACOES = ["Especialização", "Mestrado", "Doutorado"] as const;
 
 export const CHEFIAS = [
-  { id: "ch1", nome: "Dra. Maria Helena Souza" },
-  { id: "ch2", nome: "Dr. Carlos Eduardo Lima" },
-  { id: "ch3", nome: "Dra. Patrícia Mendes" },
-  { id: "ch4", nome: "Dr. Roberto Almeida" },
-  { id: "ch5", nome: "Dra. Juliana Ferreira" },
+  { id: "ch1", nome: "Dra. Maria Helena Souza", email: "maria.souza@agu.gov.br" },
+  { id: "ch2", nome: "Dr. Carlos Eduardo Lima", email: "carlos.lima@agu.gov.br" },
+  { id: "ch3", nome: "Dra. Patrícia Mendes", email: "patricia.mendes@agu.gov.br" },
+  { id: "ch4", nome: "Dr. Roberto Almeida", email: "roberto.almeida@agu.gov.br" },
+  { id: "ch5", nome: "Dra. Juliana Ferreira", email: "juliana.ferreira@agu.gov.br" },
 ];
+
+export type MessagingProvider = "NONE" | "GOOGLE" | "MICROSOFT";
+
+export interface MessagingConfig {
+  provider: MessagingProvider;
+  habilitado: boolean;
+  remetente: string;
+  // Google Workspace
+  googleClientId: string;
+  googleClientSecret: string;
+  googleRefreshToken: string;
+  // Microsoft 365 / Graph
+  msTenantId: string;
+  msClientId: string;
+  msClientSecret: string;
+  // Eventos
+  notificarNovaSolicitacao: boolean;
+  notificarDecisao: boolean;
+  copiaSolicitante: boolean;
+  copiaChefia: boolean;
+}
