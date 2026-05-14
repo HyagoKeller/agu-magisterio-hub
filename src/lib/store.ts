@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { Solicitacao, SolicitacaoStatus } from "./types";
 
-const KEY = "agu_magisterio_solicitacoes_v1";
+const KEY = "agu_magisterio_solicitacoes_v2";
 
 function load(): Solicitacao[] {
   if (typeof window === "undefined") return seed();
