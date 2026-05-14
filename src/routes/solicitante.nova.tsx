@@ -309,9 +309,8 @@ function NovaSolicitacao() {
                 </>
               )}
 
+              <Field label="CPF" required error={errors.cpf} htmlFor="cpf">
 
-                <input
-                  id="cpf"
                   value={data.cpf}
                   onChange={(e) => set("cpf", maskCPF(e.target.value))}
                   inputMode="numeric"
