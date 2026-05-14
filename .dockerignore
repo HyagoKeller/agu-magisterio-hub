@@ -1,0 +1,9 @@
+node_modules
+.output
+dist
+.git
+.vscode
+.idea
+*.log
+tsconfig.tsbuildinfo
+.DS_Store
