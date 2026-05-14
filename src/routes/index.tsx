@@ -126,6 +126,12 @@ function LoginPage() {
           </div>
         </div>
       </div>
+
+      <footer className="border-t border-border bg-card/50">
+        <div className="gov-container flex h-9 items-center justify-end text-[11px] text-muted-foreground">
+          Desenvolvido por Keller
+        </div>
+      </footer>
     </div>
   );
 }
