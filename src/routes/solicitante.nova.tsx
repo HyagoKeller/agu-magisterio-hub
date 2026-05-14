@@ -471,7 +471,13 @@ function NovaSolicitacao() {
                 <Resumo label="CPF" value={data.cpf} />
                 <Resumo label="Matrícula SIAPE" value={data.siape} />
                 <Resumo label="OAB" value={[data.oabNumero, data.oabUf].filter(Boolean).join(" / ") || "—"} />
-                <Resumo label="Tipo de Solicitação" value="Solicitação" />
+                <Resumo label="Tipo de Solicitação" value={data.tipo} />
+                {data.tipo === "Correção" && (
+                  <>
+                    <Resumo label="Protocolo a corrigir" value={data.protocoloOriginal} />
+                    <Resumo label="Descrição da correção" value={data.descricaoCorrecao} full />
+                  </>
+                )}
                 <Resumo label="Cargo" value={data.cargo} full />
                 <Resumo label="UF" value={data.uf} />
                 <Resumo label="Unidade" value={data.unidade} />
