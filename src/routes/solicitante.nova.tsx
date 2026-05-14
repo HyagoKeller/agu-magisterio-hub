@@ -7,7 +7,7 @@ import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, CHEFIAS, FORMACOES, UFS } from "@/lib/types";
+import { CARGOS, FORMACOES, UFS } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
@@ -27,15 +27,20 @@ interface FormData {
   cargo: string;
   uf: string;
   unidade: string;
-  chefiaId: string;
+  chefiaNome: string;
+  chefiaEmail: string;
   formacao: string;
 }
 
 const empty: FormData = {
   tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
-  uf: "", unidade: "", chefiaId: "", formacao: "",
+  uf: "", unidade: "", chefiaNome: "", chefiaEmail: "", formacao: "",
 };
+
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+}
 
 function maskCPF(v: string) {
   return v.replace(/\D/g, "").slice(0, 11)
@@ -65,8 +70,6 @@ function NovaSolicitacao() {
   const [step, setStep] = useState<1 | 2>(1);
   const [data, setData] = useState<FormData>(empty);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [chefiaQuery, setChefiaQuery] = useState("");
-  const [showChefiaList, setShowChefiaList] = useState(false);
   const [submitted, setSubmitted] = useState<{ protocolo: string; tipo: "Solicitação" | "Correção" } | null>(null);
 
   const all = useSolicitacoes();
@@ -74,16 +77,6 @@ function NovaSolicitacao() {
     () => all.filter((s) => s.solicitanteId === user?.id && s.status === "APROVADA" && s.tipoSolicitacao === "Solicitação"),
     [all, user]
   );
-
-  const chefiasFiltradas = useMemo(
-    () =>
-      CHEFIAS.filter((c) => {
-        const q = chefiaQuery.toLowerCase();
-        return c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
-      }),
-    [chefiaQuery]
-  );
-  const chefiaSelecionada = CHEFIAS.find((c) => c.id === data.chefiaId);
 
   const set = <K extends keyof FormData>(k: K, v: FormData[K]) => {
     setData((d) => ({ ...d, [k]: v }));
@@ -104,7 +97,10 @@ function NovaSolicitacao() {
     if (!data.cargo) e.cargo = "Selecione o cargo.";
     if (!data.uf) e.uf = "Selecione a UF.";
     if (!data.unidade.trim()) e.unidade = "Informe a unidade/equipe.";
-    if (!data.chefiaId) e.chefiaId = "Selecione a chefia imediata.";
+    if (!data.chefiaNome.trim() || data.chefiaNome.trim().length < 3)
+      e.chefiaNome = "Informe o nome completo da chefia imediata.";
+    if (!data.chefiaEmail.trim()) e.chefiaEmail = "Informe o e-mail da chefia imediata.";
+    else if (!isValidEmail(data.chefiaEmail)) e.chefiaEmail = "E-mail inválido.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -122,10 +118,10 @@ function NovaSolicitacao() {
       cargo: orig.cargo,
       uf: orig.uf,
       unidade: orig.unidade,
-      chefiaId: orig.chefiaId,
+      chefiaNome: orig.chefiaNome,
+      chefiaEmail: orig.chefiaEmail || "",
       formacao: orig.formacao || "",
     }));
-    setChefiaQuery(orig.chefiaNome);
   };
 
   const submit = () => {
@@ -133,7 +129,8 @@ function NovaSolicitacao() {
     const id = crypto.randomUUID();
     const protocolo = gerarProtocolo();
     const now = new Date().toISOString();
-    const chefia = CHEFIAS.find((c) => c.id === data.chefiaId)!;
+    const chefiaNome = data.chefiaNome.trim();
+    const chefiaEmail = data.chefiaEmail.trim().toLowerCase();
     store.add({
       id,
       protocolo,
@@ -148,8 +145,9 @@ function NovaSolicitacao() {
       cargo: data.cargo,
       uf: data.uf,
       unidade: data.unidade,
-      chefiaId: chefia.id,
-      chefiaNome: chefia.nome,
+      chefiaId: chefiaEmail,
+      chefiaNome,
+      chefiaEmail,
       formacao: data.formacao || undefined,
       tipoSolicitacao: data.tipo,
       protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
@@ -171,10 +169,10 @@ function NovaSolicitacao() {
       evento: "NOVA_SOLICITACAO",
       destinatarios: [
         { nome: user.nome, email: user.email },
-        { nome: chefia.nome, email: chefia.email },
+        { nome: chefiaNome, email: chefiaEmail },
       ],
       protocolo,
-      resumo: `${data.tipo} aberta por ${user.nome} (${data.unidade}) — chefia: ${chefia.nome}`,
+      resumo: `${data.tipo} aberta por ${user.nome} (${data.unidade}) — chefia: ${chefiaNome}`,
     });
     setSubmitted({ protocolo, tipo: data.tipo });
   };
@@ -401,61 +399,39 @@ function NovaSolicitacao() {
               </Field>
 
               <Field
-                label="Chefia Imediata"
+                label="Nome da Chefia atual"
                 required
-                error={errors.chefiaId}
-                htmlFor="chefia"
-                full
-                hint="Busque pelo nome ou e-mail. Caso não localize, ligue 0800 608 4650."
+                error={errors.chefiaNome}
+                htmlFor="chefiaNome"
               >
-                <div className="relative">
-                  <input
-                    id="chefia"
-                    value={
-                      chefiaSelecionada
-                        ? `${chefiaSelecionada.nome} — ${chefiaSelecionada.email}`
-                        : chefiaQuery
-                    }
-                    onChange={(e) => {
-                      set("chefiaId", "");
-                      setChefiaQuery(e.target.value);
-                      setShowChefiaList(true);
-                    }}
-                    onFocus={() => setShowChefiaList(true)}
-                    onBlur={() => setTimeout(() => setShowChefiaList(false), 150)}
-                    className={inputCls(!!errors.chefiaId)}
-                    placeholder="Buscar chefia por nome ou e-mail…"
-                    autoComplete="off"
-                  />
-                  {showChefiaList && chefiasFiltradas.length > 0 && (
-                    <ul
-                      role="listbox"
-                      className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-border bg-card shadow-md"
-                    >
-                      {chefiasFiltradas.map((c) => (
-                        <li
-                          key={c.id}
-                          role="option"
-                          aria-selected={data.chefiaId === c.id}
-                          onMouseDown={() => {
-                            set("chefiaId", c.id);
-                            setChefiaQuery(c.nome);
-                            setShowChefiaList(false);
-                          }}
-                          className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
-                        >
-                          <div className="font-semibold text-foreground">{c.nome}</div>
-                          <div className="text-xs text-muted-foreground">{c.email}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {chefiaSelecionada && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Notificação será enviada para <span className="font-semibold">{chefiaSelecionada.email}</span>
-                  </p>
-                )}
+                <input
+                  id="chefiaNome"
+                  value={data.chefiaNome}
+                  onChange={(e) => set("chefiaNome", e.target.value)}
+                  className={inputCls(!!errors.chefiaNome)}
+                  placeholder="Ex.: Dra. Maria Helena Souza"
+                  maxLength={120}
+                  autoComplete="off"
+                />
+              </Field>
+              <Field
+                label="E-mail da Chefia atual"
+                required
+                error={errors.chefiaEmail}
+                htmlFor="chefiaEmail"
+                hint="A notificação de análise será enviada para este endereço."
+              >
+                <input
+                  id="chefiaEmail"
+                  type="email"
+                  value={data.chefiaEmail}
+                  onChange={(e) => set("chefiaEmail", e.target.value)}
+                  className={inputCls(!!errors.chefiaEmail)}
+                  placeholder="nome.sobrenome@agu.gov.br"
+                  maxLength={150}
+                  autoComplete="off"
+                  inputMode="email"
+                />
               </Field>
 
               <Field label="Formação Acadêmica mais elevada" htmlFor="formacao" full>
@@ -505,7 +481,7 @@ function NovaSolicitacao() {
                 <Resumo label="Cargo" value={data.cargo} full />
                 <Resumo label="UF" value={data.uf} />
                 <Resumo label="Unidade" value={data.unidade} />
-                <Resumo label="Chefia Imediata" value={chefiaSelecionada?.nome ?? "—"} full />
+                <Resumo label="Chefia Imediata" value={`${data.chefiaNome}${data.chefiaEmail ? ` — ${data.chefiaEmail}` : ""}`} full />
                 <Resumo label="Formação" value={data.formacao || "—"} />
               </dl>
 
