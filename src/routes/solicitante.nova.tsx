@@ -70,8 +70,6 @@ function NovaSolicitacao() {
   const [step, setStep] = useState<1 | 2>(1);
   const [data, setData] = useState<FormData>(empty);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [chefiaQuery, setChefiaQuery] = useState("");
-  const [showChefiaList, setShowChefiaList] = useState(false);
   const [submitted, setSubmitted] = useState<{ protocolo: string; tipo: "Solicitação" | "Correção" } | null>(null);
 
   const all = useSolicitacoes();
