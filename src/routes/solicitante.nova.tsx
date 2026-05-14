@@ -401,61 +401,39 @@ function NovaSolicitacao() {
               </Field>
 
               <Field
-                label="Chefia Imediata"
+                label="Nome da Chefia atual"
                 required
-                error={errors.chefiaId}
-                htmlFor="chefia"
-                full
-                hint="Busque pelo nome ou e-mail. Caso não localize, ligue 0800 608 4650."
+                error={errors.chefiaNome}
+                htmlFor="chefiaNome"
               >
-                <div className="relative">
-                  <input
-                    id="chefia"
-                    value={
-                      chefiaSelecionada
-                        ? `${chefiaSelecionada.nome} — ${chefiaSelecionada.email}`
-                        : chefiaQuery
-                    }
-                    onChange={(e) => {
-                      set("chefiaId", "");
-                      setChefiaQuery(e.target.value);
-                      setShowChefiaList(true);
-                    }}
-                    onFocus={() => setShowChefiaList(true)}
-                    onBlur={() => setTimeout(() => setShowChefiaList(false), 150)}
-                    className={inputCls(!!errors.chefiaId)}
-                    placeholder="Buscar chefia por nome ou e-mail…"
-                    autoComplete="off"
-                  />
-                  {showChefiaList && chefiasFiltradas.length > 0 && (
-                    <ul
-                      role="listbox"
-                      className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-border bg-card shadow-md"
-                    >
-                      {chefiasFiltradas.map((c) => (
-                        <li
-                          key={c.id}
-                          role="option"
-                          aria-selected={data.chefiaId === c.id}
-                          onMouseDown={() => {
-                            set("chefiaId", c.id);
-                            setChefiaQuery(c.nome);
-                            setShowChefiaList(false);
-                          }}
-                          className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
-                        >
-                          <div className="font-semibold text-foreground">{c.nome}</div>
-                          <div className="text-xs text-muted-foreground">{c.email}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {chefiaSelecionada && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Notificação será enviada para <span className="font-semibold">{chefiaSelecionada.email}</span>
-                  </p>
-                )}
+                <input
+                  id="chefiaNome"
+                  value={data.chefiaNome}
+                  onChange={(e) => set("chefiaNome", e.target.value)}
+                  className={inputCls(!!errors.chefiaNome)}
+                  placeholder="Ex.: Dra. Maria Helena Souza"
+                  maxLength={120}
+                  autoComplete="off"
+                />
+              </Field>
+              <Field
+                label="E-mail da Chefia atual"
+                required
+                error={errors.chefiaEmail}
+                htmlFor="chefiaEmail"
+                hint="A notificação de análise será enviada para este endereço."
+              >
+                <input
+                  id="chefiaEmail"
+                  type="email"
+                  value={data.chefiaEmail}
+                  onChange={(e) => set("chefiaEmail", e.target.value)}
+                  className={inputCls(!!errors.chefiaEmail)}
+                  placeholder="nome.sobrenome@agu.gov.br"
+                  maxLength={150}
+                  autoComplete="off"
+                  inputMode="email"
+                />
               </Field>
 
               <Field label="Formação Acadêmica mais elevada" htmlFor="formacao" full>
