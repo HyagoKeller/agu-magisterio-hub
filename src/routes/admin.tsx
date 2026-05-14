@@ -29,6 +29,7 @@ function AdminLayout() {
         nav={[
           { to: "/admin", label: "Visão Geral" },
           { to: "/admin/ad", label: "Integração AD" },
+          { to: "/admin/mensageria", label: "Mensageria" },
           { to: "/admin/usuarios", label: "Usuários e Grupos" },
           { to: "/admin/acessos", label: "Solicitações de Acesso", badge: pend || undefined },
         ]}
