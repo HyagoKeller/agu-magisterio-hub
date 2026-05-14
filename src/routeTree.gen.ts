@@ -10,14 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolicitanteRouteImport } from './routes/solicitante'
+import { Route as ChefiaRouteImport } from './routes/chefia'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitanteIndexRouteImport } from './routes/solicitante.index'
+import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
+import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
+import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
+import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
 
 const SolicitanteRoute = SolicitanteRouteImport.update({
   id: '/solicitante',
   path: '/solicitante',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChefiaRoute = ChefiaRouteImport.update({
+  id: '/chefia',
+  path: '/chefia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -30,6 +40,11 @@ const SolicitanteIndexRoute = SolicitanteIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SolicitanteRoute,
 } as any)
+const ChefiaIndexRoute = ChefiaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ChefiaRoute,
+} as any)
 const SolicitanteNovaRoute = SolicitanteNovaRouteImport.update({
   id: '/nova',
   path: '/nova',
@@ -40,49 +55,97 @@ const SolicitanteMinhasRoute = SolicitanteMinhasRouteImport.update({
   path: '/minhas',
   getParentRoute: () => SolicitanteRoute,
 } as any)
+const ChefiaPendentesRoute = ChefiaPendentesRouteImport.update({
+  id: '/pendentes',
+  path: '/pendentes',
+  getParentRoute: () => ChefiaRoute,
+} as any)
+const ChefiaHistoricoRoute = ChefiaHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => ChefiaRoute,
+} as any)
+const ChefiaAnaliseIdRoute = ChefiaAnaliseIdRouteImport.update({
+  id: '/analise/$id',
+  path: '/analise/$id',
+  getParentRoute: () => ChefiaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chefia': typeof ChefiaRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
+  '/chefia/historico': typeof ChefiaHistoricoRoute
+  '/chefia/pendentes': typeof ChefiaPendentesRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/chefia/': typeof ChefiaIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
+  '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chefia/historico': typeof ChefiaHistoricoRoute
+  '/chefia/pendentes': typeof ChefiaPendentesRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/chefia': typeof ChefiaIndexRoute
   '/solicitante': typeof SolicitanteIndexRoute
+  '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/chefia': typeof ChefiaRouteWithChildren
   '/solicitante': typeof SolicitanteRouteWithChildren
+  '/chefia/historico': typeof ChefiaHistoricoRoute
+  '/chefia/pendentes': typeof ChefiaPendentesRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
+  '/chefia/': typeof ChefiaIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
+  '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/chefia'
     | '/solicitante'
+    | '/chefia/historico'
+    | '/chefia/pendentes'
     | '/solicitante/minhas'
     | '/solicitante/nova'
+    | '/chefia/'
     | '/solicitante/'
+    | '/chefia/analise/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/solicitante/minhas' | '/solicitante/nova' | '/solicitante'
+  to:
+    | '/'
+    | '/chefia/historico'
+    | '/chefia/pendentes'
+    | '/solicitante/minhas'
+    | '/solicitante/nova'
+    | '/chefia'
+    | '/solicitante'
+    | '/chefia/analise/$id'
   id:
     | '__root__'
     | '/'
+    | '/chefia'
     | '/solicitante'
+    | '/chefia/historico'
+    | '/chefia/pendentes'
     | '/solicitante/minhas'
     | '/solicitante/nova'
+    | '/chefia/'
     | '/solicitante/'
+    | '/chefia/analise/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChefiaRoute: typeof ChefiaRouteWithChildren
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
 }
 
@@ -93,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/solicitante'
       fullPath: '/solicitante'
       preLoaderRoute: typeof SolicitanteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chefia': {
+      id: '/chefia'
+      path: '/chefia'
+      fullPath: '/chefia'
+      preLoaderRoute: typeof ChefiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -109,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitanteIndexRouteImport
       parentRoute: typeof SolicitanteRoute
     }
+    '/chefia/': {
+      id: '/chefia/'
+      path: '/'
+      fullPath: '/chefia/'
+      preLoaderRoute: typeof ChefiaIndexRouteImport
+      parentRoute: typeof ChefiaRoute
+    }
     '/solicitante/nova': {
       id: '/solicitante/nova'
       path: '/nova'
@@ -123,8 +200,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitanteMinhasRouteImport
       parentRoute: typeof SolicitanteRoute
     }
+    '/chefia/pendentes': {
+      id: '/chefia/pendentes'
+      path: '/pendentes'
+      fullPath: '/chefia/pendentes'
+      preLoaderRoute: typeof ChefiaPendentesRouteImport
+      parentRoute: typeof ChefiaRoute
+    }
+    '/chefia/historico': {
+      id: '/chefia/historico'
+      path: '/historico'
+      fullPath: '/chefia/historico'
+      preLoaderRoute: typeof ChefiaHistoricoRouteImport
+      parentRoute: typeof ChefiaRoute
+    }
+    '/chefia/analise/$id': {
+      id: '/chefia/analise/$id'
+      path: '/analise/$id'
+      fullPath: '/chefia/analise/$id'
+      preLoaderRoute: typeof ChefiaAnaliseIdRouteImport
+      parentRoute: typeof ChefiaRoute
+    }
   }
 }
+
+interface ChefiaRouteChildren {
+  ChefiaHistoricoRoute: typeof ChefiaHistoricoRoute
+  ChefiaPendentesRoute: typeof ChefiaPendentesRoute
+  ChefiaIndexRoute: typeof ChefiaIndexRoute
+  ChefiaAnaliseIdRoute: typeof ChefiaAnaliseIdRoute
+}
+
+const ChefiaRouteChildren: ChefiaRouteChildren = {
+  ChefiaHistoricoRoute: ChefiaHistoricoRoute,
+  ChefiaPendentesRoute: ChefiaPendentesRoute,
+  ChefiaIndexRoute: ChefiaIndexRoute,
+  ChefiaAnaliseIdRoute: ChefiaAnaliseIdRoute,
+}
+
+const ChefiaRouteWithChildren =
+  ChefiaRoute._addFileChildren(ChefiaRouteChildren)
 
 interface SolicitanteRouteChildren {
   SolicitanteMinhasRoute: typeof SolicitanteMinhasRoute
@@ -144,6 +259,7 @@ const SolicitanteRouteWithChildren = SolicitanteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChefiaRoute: ChefiaRouteWithChildren,
   SolicitanteRoute: SolicitanteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
