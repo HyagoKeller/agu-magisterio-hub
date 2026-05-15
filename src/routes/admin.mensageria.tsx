@@ -110,8 +110,15 @@ function MensageriaPage() {
                   value={form.remetente}
                   onChange={(e) => set("remetente", e.target.value)}
                   className={inp}
-                  placeholder="no-reply@agu.gov.br"
+                  placeholder="magisterio@agu.gov.br"
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Deve ser uma <strong>caixa de correio real</strong> existente no tenant
+                  (usuário com Exchange Online ou <em>shared mailbox</em>). Endereços fictícios
+                  como <code>no-reply@agu.gov.br</code> só funcionam se a caixa tiver sido
+                  criada no Microsoft 365 e a aplicação tiver permissão <code>Mail.Send</code>
+                  sobre ela.
+                </p>
               </Field>
               <label className="inline-flex items-center gap-2 text-sm font-semibold mt-7">
                 <input
@@ -169,7 +176,11 @@ function MensageriaPage() {
               <p className="text-sm text-muted-foreground mb-4">
                 Registre uma aplicação no Azure AD com a permissão
                 <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-xs">Mail.Send</code> (Application) e
-                conceda o consentimento do administrador.
+                conceda o consentimento do administrador. <strong>Importante:</strong> o e-mail
+                remetente acima precisa ser uma <em>mailbox real</em> existente no tenant —
+                caso contrário o Graph retorna <code>404 ErrorInvalidUser</code>. Para "no-reply",
+                crie uma <em>shared mailbox</em> no Exchange Online e restrinja o acesso da app
+                via <a className="underline" target="_blank" rel="noreferrer" href="https://learn.microsoft.com/exchange/permissions-exo/application-rbac">Application Access Policy</a>.
               </p>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="Tenant ID" required>
