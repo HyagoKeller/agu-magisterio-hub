@@ -110,8 +110,15 @@ function MensageriaPage() {
                   value={form.remetente}
                   onChange={(e) => set("remetente", e.target.value)}
                   className={inp}
-                  placeholder="no-reply@agu.gov.br"
+                  placeholder="magisterio@agu.gov.br"
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Deve ser uma <strong>caixa de correio real</strong> existente no tenant
+                  (usuário com Exchange Online ou <em>shared mailbox</em>). Endereços fictícios
+                  como <code>no-reply@agu.gov.br</code> só funcionam se a caixa tiver sido
+                  criada no Microsoft 365 e a aplicação tiver permissão <code>Mail.Send</code>
+                  sobre ela.
+                </p>
               </Field>
               <label className="inline-flex items-center gap-2 text-sm font-semibold mt-7">
                 <input
