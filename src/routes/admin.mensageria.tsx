@@ -176,7 +176,11 @@ function MensageriaPage() {
               <p className="text-sm text-muted-foreground mb-4">
                 Registre uma aplicação no Azure AD com a permissão
                 <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-xs">Mail.Send</code> (Application) e
-                conceda o consentimento do administrador.
+                conceda o consentimento do administrador. <strong>Importante:</strong> o e-mail
+                remetente acima precisa ser uma <em>mailbox real</em> existente no tenant —
+                caso contrário o Graph retorna <code>404 ErrorInvalidUser</code>. Para "no-reply",
+                crie uma <em>shared mailbox</em> no Exchange Online e restrinja o acesso da app
+                via <a className="underline" target="_blank" rel="noreferrer" href="https://learn.microsoft.com/exchange/permissions-exo/application-rbac">Application Access Policy</a>.
               </p>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="Tenant ID" required>
