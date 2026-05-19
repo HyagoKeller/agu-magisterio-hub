@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { StatusTag } from "@/components/StatusTag";
 import { GovMessage } from "@/components/GovMessage";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
