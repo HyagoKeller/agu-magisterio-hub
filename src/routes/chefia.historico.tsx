@@ -101,7 +101,7 @@ function Historico() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/50 text-left">
-                <Th>Protocolo</Th><Th>Solicitante</Th><Th>Decisão</Th><Th>Data da Decisão</Th><Th>Comentário</Th><Th></Th>
+                <Th>Protocolo</Th><Th>Solicitante</Th><Th>Decisão</Th><Th>Data da Decisão</Th><Th>Comentário</Th><Th> </Th>
               </tr>
             </thead>
             <tbody>
