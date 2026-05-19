@@ -19,6 +19,9 @@ function Historico() {
   const [status, setStatus] = useState<"TODAS" | "APROVADA" | "RECUSADA">("TODAS");
   const [ini, setIni] = useState("");
   const [fim, setFim] = useState("");
+  const [verId, setVerId] = useState<string | null>(null);
+
+  const verS = all.find((s) => s.id === verId) || null;
 
   const list = useMemo(() => {
     return all
