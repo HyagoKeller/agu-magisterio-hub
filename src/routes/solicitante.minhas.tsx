@@ -234,10 +234,10 @@ export function DetalheDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={onClose}>
       <aside
-        className="h-full w-full max-w-lg overflow-y-auto bg-card shadow-xl"
+        className="h-full w-full max-w-2xl overflow-y-auto bg-card shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-5 py-4">
           <div>
             <div className="text-xs text-muted-foreground">Protocolo</div>
             <div className="font-display text-lg text-gov-blue-dark">{s.protocolo}</div>
@@ -251,91 +251,10 @@ export function DetalheDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="space-y-5 px-5 py-5">
-          <div className="flex items-center gap-3 flex-wrap">
-            <StatusTag status={s.status} />
-            <span className="text-xs text-muted-foreground">
-              Aberta em {new Date(s.dataAbertura).toLocaleString("pt-BR")}
-            </span>
-          </div>
-
-          {s.status === "RECUSADA" && s.justificativaRecusa && (
-            <GovMessage tone="danger" title="Justificativa da recusa">
-              {s.justificativaRecusa}
-            </GovMessage>
-          )}
-          {s.status === "APROVADA" && (
-            <GovMessage tone="success" title="Solicitação aprovada">
-              Sua solicitação foi aprovada pela chefia imediata.
-            </GovMessage>
-          )}
-
-          {s.recurso && (
-            <GovMessage
-              tone={s.recurso.status === "ACEITO" ? "success" : s.recurso.status === "REJEITADO" ? "danger" : "info"}
-              title={`Recurso ${s.recurso.status.toLowerCase()}`}
-            >
-              <div className="text-xs mb-1">
-                Protocolado em {new Date(s.recurso.dataSolicitacao).toLocaleString("pt-BR")}
-              </div>
-              <div className="whitespace-pre-wrap text-sm">{s.recurso.texto}</div>
-              {s.recurso.decisaoComentario && (
-                <div className="mt-2 border-t border-border/50 pt-2 text-xs">
-                  <strong>Decisão:</strong> {s.recurso.decisaoComentario}
-                </div>
-              )}
-            </GovMessage>
-          )}
-
-          <dl className="grid grid-cols-2 gap-4">
-            <Info label="Solicitante" value={s.solicitanteNome} full />
-            <Info label="CPF" value={s.cpf} />
-            <Info label="SIAPE" value={s.siape} />
-            <Info label="Cargo" value={s.cargo} full />
-            <Info label="UF" value={s.uf} />
-            <Info label="Unidade" value={s.unidade} />
-            <Info label="Chefia" value={s.chefiaNome} full />
-            <Info label="Formação" value={s.formacao || "—"} />
-            <Info label="Tipo" value={s.tipoSolicitacao} />
-          </dl>
-
-          {s.atividades && (
-            <div>
-              <h3 className="mb-2 font-display text-base">Atividades de ensino</h3>
-              <dl className="grid gap-3">
-                <Info label="Disciplinas ministradas (Art. 2º; I, V, VI)" value={s.atividades.disciplinas || "—"} full />
-                <Info label="Elaboração de Projeto Pedagógico (Art. 2º, II)" value={s.atividades.projetoPedagogico || "—"} full />
-                <Info label="Material didático e/ou projetos de pesquisa (Art. 2º, III)" value={s.atividades.material || "—"} full />
-                <Info label="Elaboração de avaliações (Art. 2º, IV)" value={s.atividades.avaliacoes || "—"} full />
-              </dl>
-            </div>
-          )}
-
-          <div>
-            <h3 className="mb-2 font-display text-base">Histórico de movimentações</h3>
-            <ol className="space-y-3 border-l-2 border-gov-blue/30 pl-4">
-              {s.historico.map((h, i) => (
-                <li key={i} className="relative">
-                  <span className="absolute -left-[22px] top-1.5 h-3 w-3 rounded-full bg-gov-blue" />
-                  <div className="text-sm font-semibold text-gov-blue-dark">{h.evento}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(h.data).toLocaleString("pt-BR")} • {h.autor}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+        <div className="px-5 py-5">
+          <SolicitacaoDetalhe s={s} />
         </div>
       </aside>
-    </div>
-  );
-}
-
-function Info({ label, value, full }: { label: string; value: string; full?: boolean }) {
-  return (
-    <div className={full ? "col-span-2" : ""}>
-      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-sm whitespace-pre-wrap">{value}</dd>
     </div>
   );
 }
