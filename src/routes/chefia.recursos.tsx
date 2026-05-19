@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
 import type { Solicitacao } from "@/lib/types";
