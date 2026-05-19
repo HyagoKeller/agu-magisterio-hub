@@ -19,6 +19,7 @@ function ChefiaLayout() {
 
   if (!user || user.role !== "CHEFIA") return null;
 
+  const pendentes = all.filter((s) => s.chefiaId === user.id && s.status === "PENDENTE").length;
   const recursosPendentes = all.filter((s) => s.chefiaId === user.id && s.recurso?.status === "PENDENTE").length;
   const totalUnread = pendentes + recursosPendentes;
 
