@@ -4,6 +4,7 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
 import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
