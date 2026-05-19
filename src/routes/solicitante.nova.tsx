@@ -7,7 +7,7 @@ import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, FORMACOES, UFS } from "@/lib/types";
+import { CARGOS, DIAS_LABEL, DIAS_SEMANA, FORMACOES, TURNOS, TURNOS_LABEL, UFS, type AtividadesEnsino } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
@@ -30,12 +30,25 @@ interface FormData {
   chefiaNome: string;
   chefiaEmail: string;
   formacao: string;
+  atividades: AtividadesEnsino;
 }
+
+const emptyAtividades: AtividadesEnsino = {
+  horarios: {},
+  disciplinas: "",
+  projetoPedagogico: "",
+  material: "",
+  avaliacoes: "",
+  declaracaoLeu: true,
+  declaracaoVerdade: false,
+  declaracaoCiente: false,
+};
 
 const empty: FormData = {
   tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
   uf: "", unidade: "", chefiaNome: "", chefiaEmail: "", formacao: "",
+  atividades: emptyAtividades,
 };
 
 function isValidEmail(v: string) {
