@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
 import type { Solicitacao } from "@/lib/types";
@@ -149,7 +150,7 @@ function AnaliseRecursoDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={onClose}>
-      <aside className="h-full w-full max-w-lg overflow-y-auto bg-card shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <aside className="h-full w-full max-w-3xl overflow-y-auto bg-card shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <div className="text-xs text-muted-foreground">Recurso ao protocolo</div>
@@ -160,10 +161,14 @@ function AnaliseRecursoDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
           </button>
         </div>
         <div className="space-y-5 px-5 py-5">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Solicitante</div>
-            <div className="text-sm">{s.solicitanteNome} • {s.unidade}</div>
-          </div>
+          <details open className="rounded-md border border-border bg-muted/20">
+            <summary className="cursor-pointer px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gov-blue-dark">
+              Dados completos da solicitação
+            </summary>
+            <div className="border-t border-border bg-card px-3 py-4">
+              <SolicitacaoDetalhe s={s} showRecurso={false} />
+            </div>
+          </details>
 
           <GovMessage tone="danger" title="Justificativa da recusa original">
             {s.justificativaRecusa || "—"}
