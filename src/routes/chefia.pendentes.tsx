@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { GovBreadcrumb } from "@/components/GovHeader";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
+import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
 
@@ -10,9 +13,12 @@ export const Route = createFileRoute("/chefia/pendentes")({
 
 function Pendentes() {
   const { user } = useAuth();
-  const list = useSolicitacoes()
+  const [verId, setVerId] = useState<string | null>(null);
+  const all = useSolicitacoes();
+  const list = all
     .filter((s) => s.chefiaId === user?.id && s.status === "PENDENTE")
     .sort((a, b) => a.dataAbertura.localeCompare(b.dataAbertura));
+  const verS = all.find((s) => s.id === verId) || null;
 
   return (
     <>
