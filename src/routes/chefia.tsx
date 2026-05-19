@@ -19,17 +19,20 @@ function ChefiaLayout() {
 
   if (!user || user.role !== "CHEFIA") return null;
 
-  const pendentes = all.filter((s) => s.chefiaId === user.id && s.status === "PENDENTE").length;
+  const recursosPendentes = all.filter((s) => s.chefiaId === user.id && s.recurso?.status === "PENDENTE").length;
+  const totalUnread = pendentes + recursosPendentes;
 
   return (
     <div className="min-h-screen bg-background">
       <GovHeader
         perfilLabel="Chefia Imediata"
-        unread={pendentes}
+        unread={totalUnread}
         nav={[
           { to: "/chefia", label: "Início" },
           { to: "/chefia/pendentes", label: "Aprovações Pendentes", badge: pendentes || undefined },
+          { to: "/chefia/recursos", label: "Recursos", badge: recursosPendentes || undefined },
           { to: "/chefia/historico", label: "Histórico" },
+          { to: "/faq", label: "Dúvidas? FAQ" },
         ]}
       />
       <main><Outlet /></main>

@@ -6,7 +6,7 @@ const KEY = "agu_magisterio_user_v1";
 const PRESET: Record<Role, User> = {
   SOLICITANTE: { id: "u1", nome: "João Pereira da Silva", email: "joao.silva@agu.gov.br", role: "SOLICITANTE", matricula: "1234567", emailPessoal: "joao.silva.pessoal@gmail.com", origem: "AD", ativo: true },
   CHEFIA: { id: "ch1", nome: "Dra. Maria Helena Souza", email: "maria.souza@agu.gov.br", role: "CHEFIA", origem: "AD", ativo: true },
-  COORDENADOR: { id: "co1", nome: "Dr. Antônio Coordenador CGU/AGU", email: "antonio.cgu@agu.gov.br", role: "COORDENADOR", origem: "AD", ativo: true },
+  COORDENADOR: { id: "co1", nome: "Dr. Antônio Coordenador CGAU/AGU", email: "antonio.cgau@agu.gov.br", role: "COORDENADOR", origem: "AD", ativo: true },
   SUPERADMIN: { id: "sa1", nome: "Administrador do Sistema", email: "admin.ti@agu.gov.br", role: "SUPERADMIN", origem: "MANUAL", ativo: true },
 };
 
