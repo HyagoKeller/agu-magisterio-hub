@@ -171,7 +171,7 @@ function NovaSolicitacao() {
       tipoSolicitacao: data.tipo,
       protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
       descricaoCorrecao: data.tipo === "Correção" ? data.descricaoCorrecao : undefined,
-      atividades: data.tipo === "Solicitação" ? data.atividades : undefined,
+      atividades: data.atividades,
       status: "PENDENTE",
       historico: [{
         data: now,
