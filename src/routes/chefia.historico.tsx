@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { StatusTag } from "@/components/StatusTag";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
+import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
 
@@ -17,6 +19,9 @@ function Historico() {
   const [status, setStatus] = useState<"TODAS" | "APROVADA" | "RECUSADA">("TODAS");
   const [ini, setIni] = useState("");
   const [fim, setFim] = useState("");
+  const [verId, setVerId] = useState<string | null>(null);
+
+  const verS = all.find((s) => s.id === verId) || null;
 
   const list = useMemo(() => {
     return all
@@ -96,12 +101,12 @@ function Historico() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/50 text-left">
-                <Th>Protocolo</Th><Th>Solicitante</Th><Th>Decisão</Th><Th>Data da Decisão</Th><Th>Comentário</Th>
+                <Th>Protocolo</Th><Th>Solicitante</Th><Th>Decisão</Th><Th>Data da Decisão</Th><Th>Comentário</Th><Th> </Th>
               </tr>
             </thead>
             <tbody>
               {list.length === 0 && (
-                <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">Nenhum registro.</td></tr>
+                <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">Nenhum registro.</td></tr>
               )}
               {list.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted/30">
@@ -110,12 +115,28 @@ function Historico() {
                   <Td><StatusTag status={s.status} /></Td>
                   <Td>{s.dataDecisao ? new Date(s.dataDecisao).toLocaleString("pt-BR") : "—"}</Td>
                   <Td className="max-w-sm truncate">{s.decisaoComentario || s.justificativaRecusa || "—"}</Td>
+                  <Td className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setVerId(s.id)}
+                      className="inline-flex rounded-full border border-gov-blue px-3 py-1.5 text-xs font-semibold text-gov-blue hover:bg-accent"
+                    >
+                      Detalhes
+                    </button>
+                  </Td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+
+      {verS && (
+        <Modal onClose={() => setVerId(null)}>
+          <h2 className="font-display text-lg mb-4">Solicitação {verS.protocolo}</h2>
+          <SolicitacaoDetalhe s={verS} />
+        </Modal>
+      )}
     </>
   );
 }

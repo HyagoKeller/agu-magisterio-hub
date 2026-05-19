@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { GovBreadcrumb } from "@/components/GovHeader";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
+import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
 
@@ -10,9 +13,12 @@ export const Route = createFileRoute("/chefia/pendentes")({
 
 function Pendentes() {
   const { user } = useAuth();
-  const list = useSolicitacoes()
+  const [verId, setVerId] = useState<string | null>(null);
+  const all = useSolicitacoes();
+  const list = all
     .filter((s) => s.chefiaId === user?.id && s.status === "PENDENTE")
     .sort((a, b) => a.dataAbertura.localeCompare(b.dataAbertura));
+  const verS = all.find((s) => s.id === verId) || null;
 
   return (
     <>
@@ -62,13 +68,22 @@ function Pendentes() {
                   <Td>{s.unidade} / {s.uf}</Td>
                   <Td>{new Date(s.dataAbertura).toLocaleDateString("pt-BR")}</Td>
                   <Td className="text-right">
-                    <Link
-                      to="/chefia/analise/$id"
-                      params={{ id: s.id }}
-                      className="inline-flex rounded-full bg-gov-blue px-4 py-1.5 text-xs font-semibold text-white hover:bg-gov-blue-dark"
-                    >
-                      Analisar
-                    </Link>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setVerId(s.id)}
+                        className="inline-flex rounded-full border border-gov-blue px-3 py-1.5 text-xs font-semibold text-gov-blue hover:bg-accent"
+                      >
+                        Detalhes
+                      </button>
+                      <Link
+                        to="/chefia/analise/$id"
+                        params={{ id: s.id }}
+                        className="inline-flex rounded-full bg-gov-blue px-4 py-1.5 text-xs font-semibold text-white hover:bg-gov-blue-dark"
+                      >
+                        Analisar
+                      </Link>
+                    </div>
                   </Td>
                 </tr>
               ))}
@@ -76,6 +91,22 @@ function Pendentes() {
           </table>
         </div>
       </section>
+
+      {verS && (
+        <Modal onClose={() => setVerId(null)}>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-display text-lg">Solicitação {verS.protocolo}</h2>
+            <Link
+              to="/chefia/analise/$id"
+              params={{ id: verS.id }}
+              className="rounded-full bg-gov-blue px-4 py-1.5 text-xs font-semibold text-white hover:bg-gov-blue-dark"
+            >
+              Ir para análise
+            </Link>
+          </div>
+          <SolicitacaoDetalhe s={verS} />
+        </Modal>
+      )}
     </>
   );
 }
