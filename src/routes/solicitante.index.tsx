@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Clock, FileText, Plus, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, FileText, Gavel, Plus, XCircle } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
+import { GovMessage } from "@/components/GovMessage";
 import { StatusTag } from "@/components/StatusTag";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
+import { addBusinessDays, dentroPrazoRecurso } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/")({
   head: () => ({
@@ -20,6 +22,12 @@ function DashboardSolicitante() {
   const pendentes = minhas.filter((s) => s.status === "PENDENTE").length;
   const aprovadas = minhas.filter((s) => s.status === "APROVADA").length;
   const recusadas = minhas.filter((s) => s.status === "RECUSADA").length;
+
+  const recursaveis = minhas.filter(
+    (s) => s.status === "RECUSADA" && !s.recurso && dentroPrazoRecurso(s.dataDecisao)
+  );
+  const recursosEmAndamento = minhas.filter((s) => s.recurso);
+
   const recentes = [...minhas]
     .sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura))
     .slice(0, 5);
@@ -50,6 +58,38 @@ function DashboardSolicitante() {
           </Link>
         </div>
 
+        {recursaveis.length > 0 && (
+          <div className="mb-6">
+            <GovMessage tone="warning" title="Você pode entrar com Recurso">
+              <p className="mb-2 text-sm">
+                {recursaveis.length === 1
+                  ? "Uma solicitação sua foi recusada e ainda está dentro do prazo de recurso (5 dias úteis)."
+                  : `${recursaveis.length} solicitações suas foram recusadas e ainda estão dentro do prazo de recurso (5 dias úteis).`}
+                {" "}O recurso pode ser interposto <strong>uma única vez</strong>.
+              </p>
+              <ul className="mb-3 space-y-1 text-sm">
+                {recursaveis.map((s) => {
+                  const prazo = s.dataDecisao ? addBusinessDays(new Date(s.dataDecisao), 5) : null;
+                  return (
+                    <li key={s.id} className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-gov-blue-dark">{s.protocolo}</span>
+                      <span className="text-xs text-muted-foreground">
+                        prazo final: {prazo?.toLocaleDateString("pt-BR")}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <Link
+                to="/solicitante/minhas"
+                className="inline-flex items-center gap-2 rounded-full bg-gov-red px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+              >
+                <Gavel className="h-3.5 w-3.5" /> Entrar com Recurso
+              </Link>
+            </GovMessage>
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {cards.map((c) => (
             <div key={c.label} className="gov-card">
@@ -61,6 +101,38 @@ function DashboardSolicitante() {
             </div>
           ))}
         </div>
+
+        {recursosEmAndamento.length > 0 && (
+          <div className="gov-card mb-8">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-display text-lg flex items-center gap-2">
+                <Gavel className="h-5 w-5 text-gov-blue" /> Meus Recursos
+              </h2>
+              <Link to="/solicitante/minhas" className="text-sm font-semibold text-gov-blue hover:underline">
+                Ver todos
+              </Link>
+            </div>
+            <ul className="divide-y divide-border">
+              {recursosEmAndamento.map((s) => (
+                <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <div>
+                    <div className="font-semibold text-gov-blue-dark">{s.protocolo}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Recurso protocolado em {new Date(s.recurso!.dataSolicitacao).toLocaleDateString("pt-BR")}
+                    </div>
+                  </div>
+                  <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                    s.recurso!.status === "PENDENTE" ? "bg-[oklch(0.95_0.06_75)] text-[oklch(0.45_0.15_60)]" :
+                    s.recurso!.status === "ACEITO" ? "bg-[oklch(0.94_0.08_145)] text-gov-success" :
+                    "bg-[oklch(0.95_0.05_27)] text-gov-danger"
+                  }`}>
+                    Recurso {s.recurso!.status.toLowerCase()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="gov-card">
           <div className="mb-4 flex items-center justify-between">
