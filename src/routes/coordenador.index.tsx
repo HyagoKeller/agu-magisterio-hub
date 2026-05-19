@@ -121,16 +121,6 @@ function DashboardCoord() {
               <input id="data-ate" type="date" value={ate} onChange={(e) => setAte(e.target.value)} min={de}
                 className="rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue" />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { l: "7 dias", d: 7 }, { l: "30 dias", d: 30 }, { l: "90 dias", d: 90 }, { l: "12 meses", d: 365 },
-              ].map((p) => (
-                <button key={p.l} onClick={() => aplicarPreset(p.d)}
-                  className="rounded-full border border-gov-blue px-3 py-1.5 text-xs font-semibold text-gov-blue hover:bg-accent">
-                  {p.l}
-                </button>
-              ))}
-            </div>
             <div className="ml-auto text-xs text-muted-foreground">
               {filtradas.length} {filtradas.length === 1 ? "solicitação no período" : "solicitações no período"}
             </div>
