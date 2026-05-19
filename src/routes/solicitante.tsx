@@ -33,6 +33,7 @@ function SolicitanteLayout() {
         nav={[
           { to: "/solicitante", label: "Início" },
           { to: "/solicitante/minhas", label: "Minhas Solicitações" },
+          { to: "/faq", label: "Dúvidas? FAQ" },
         ]}
         rightAction={
           <Link

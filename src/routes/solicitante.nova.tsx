@@ -7,7 +7,7 @@ import { GovMessage } from "@/components/GovMessage";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, FORMACOES, UFS } from "@/lib/types";
+import { CARGOS, DIAS_LABEL, DIAS_SEMANA, FORMACOES, TURNOS, TURNOS_LABEL, UFS, type AtividadesEnsino } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
@@ -30,12 +30,25 @@ interface FormData {
   chefiaNome: string;
   chefiaEmail: string;
   formacao: string;
+  atividades: AtividadesEnsino;
 }
+
+const emptyAtividades: AtividadesEnsino = {
+  horarios: {},
+  disciplinas: "",
+  projetoPedagogico: "",
+  material: "",
+  avaliacoes: "",
+  declaracaoLeu: true,
+  declaracaoVerdade: false,
+  declaracaoCiente: false,
+};
 
 const empty: FormData = {
   tipo: "Solicitação", protocoloOriginal: "", descricaoCorrecao: "",
   cpf: "", siape: "", oabNumero: "", oabUf: "", cargo: "",
   uf: "", unidade: "", chefiaNome: "", chefiaEmail: "", formacao: "",
+  atividades: emptyAtividades,
 };
 
 function isValidEmail(v: string) {
@@ -101,6 +114,12 @@ function NovaSolicitacao() {
       e.chefiaNome = "Informe o nome completo da chefia imediata.";
     if (!data.chefiaEmail.trim()) e.chefiaEmail = "Informe o e-mail da chefia imediata.";
     else if (!isValidEmail(data.chefiaEmail)) e.chefiaEmail = "E-mail inválido.";
+    if (data.tipo === "Solicitação") {
+      const a = data.atividades;
+      const algumPreenchido = a.disciplinas.trim() || a.projetoPedagogico.trim() || a.material.trim() || a.avaliacoes.trim();
+      if (!algumPreenchido) (e as Record<string, string>).atividades = "Informe ao menos uma atividade de ensino.";
+      if (!a.declaracaoVerdade || !a.declaracaoCiente) (e as Record<string, string>).declaracoes = "Confirme as declarações obrigatórias de boa-fé.";
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -152,6 +171,7 @@ function NovaSolicitacao() {
       tipoSolicitacao: data.tipo,
       protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
       descricaoCorrecao: data.tipo === "Correção" ? data.descricaoCorrecao : undefined,
+      atividades: data.tipo === "Solicitação" ? data.atividades : undefined,
       status: "PENDENTE",
       historico: [{
         data: now,
@@ -445,6 +465,151 @@ function NovaSolicitacao() {
                   {FORMACOES.map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
               </Field>
+
+              {data.tipo === "Solicitação" && (
+                <div className="sm:col-span-2 space-y-4">
+                  <div className="rounded-md bg-gov-blue-dark px-4 py-2.5 text-sm font-semibold uppercase tracking-wider text-white">
+                    Atividades de Ensino
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    As informações abaixo serão encaminhadas à sua chefia imediata.
+                  </p>
+
+                  <fieldset className="rounded-md border border-border p-4">
+                    <legend className="px-2 text-sm font-semibold">Horários das Disciplinas</legend>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Marque os turnos ocupados com atividades pelo docente neste semestre. "Variável" = horário; "Dias Alternados" = não semanal.
+                    </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            {DIAS_SEMANA.map((d) => (
+                              <th key={d} className="px-2 py-1.5 font-semibold text-muted-foreground">{DIAS_LABEL[d]}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {TURNOS.map((t) => (
+                            <tr key={t} className="border-t border-border">
+                              <th className="px-2 py-2 text-left font-semibold text-gov-blue-dark">{TURNOS_LABEL[t]}</th>
+                              {DIAS_SEMANA.map((d) => {
+                                const key = `${t}-${d}`;
+                                return (
+                                  <td key={d} className="px-2 py-2 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!data.atividades.horarios[key]}
+                                      onChange={(e) =>
+                                        set("atividades", {
+                                          ...data.atividades,
+                                          horarios: { ...data.atividades.horarios, [key]: e.target.checked },
+                                        })
+                                      }
+                                      className="h-4 w-4 accent-gov-blue"
+                                      aria-label={`${TURNOS_LABEL[t]} ${DIAS_LABEL[d]}`}
+                                    />
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </fieldset>
+
+                  <Field label="Disciplinas Ministradas (Art. 2°; I, V, VI) e Projetos de Extensão" htmlFor="ativ-disc" full hint="Por linha: NOME DA INSTITUIÇÃO, CIDADE/UF, NOME DA DISCIPLINA, DIAS, HORÁRIO.">
+                    <textarea
+                      id="ativ-disc"
+                      rows={4}
+                      value={data.atividades.disciplinas}
+                      onChange={(e) => set("atividades", { ...data.atividades, disciplinas: e.target.value })}
+                      className={inputCls(false)}
+                      placeholder="Ex.: Universidade de Brasília-UnB, Brasília/DF, Direito Empresarial, Segundas e Quartas, 19:00 às 22:00;"
+                    />
+                  </Field>
+
+                  <Field label="Elaboração de Projeto Pedagógico (Art. 2°, II)" htmlFor="ativ-proj" full hint="Por linha: INSTITUIÇÃO, CIDADE/UF, DEPARTAMENTO, TÍTULO DO PROJETO, DIAS, HORÁRIO.">
+                    <textarea
+                      id="ativ-proj"
+                      rows={3}
+                      value={data.atividades.projetoPedagogico}
+                      onChange={(e) => set("atividades", { ...data.atividades, projetoPedagogico: e.target.value })}
+                      className={inputCls(false)}
+                    />
+                  </Field>
+
+                  <Field label="Material Didático/Programa de Ensino (Art. 2°, III) e Projetos de Pesquisa" htmlFor="ativ-mat" full hint="Por linha: INSTITUIÇÃO, CIDADE/UF, DEPARTAMENTO, TÍTULO DO MATERIAL/PROGRAMA, DIAS, HORÁRIO.">
+                    <textarea
+                      id="ativ-mat"
+                      rows={3}
+                      value={data.atividades.material}
+                      onChange={(e) => set("atividades", { ...data.atividades, material: e.target.value })}
+                      className={inputCls(false)}
+                    />
+                  </Field>
+
+                  <Field label="Elaboração de Avaliações, Provas, Simulados e Afins (Art. 2°, IV)" htmlFor="ativ-aval" full hint="Por linha: INSTITUIÇÃO, CIDADE/UF, DEPARTAMENTO, TÍTULO, DIAS, HORÁRIO.">
+                    <textarea
+                      id="ativ-aval"
+                      rows={3}
+                      value={data.atividades.avaliacoes}
+                      onChange={(e) => set("atividades", { ...data.atividades, avaliacoes: e.target.value })}
+                      className={inputCls(false)}
+                    />
+                  </Field>
+
+                  {(errors as Record<string, string>).atividades && (
+                    <p role="alert" className="text-xs font-semibold text-gov-danger">
+                      {(errors as Record<string, string>).atividades}
+                    </p>
+                  )}
+
+                  <fieldset className="rounded-md border-2 border-gov-blue/30 p-4">
+                    <legend className="px-2 text-sm font-semibold text-gov-blue-dark">DECLARAÇÃO DE BOA-FÉ <span className="text-gov-red">*</span></legend>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Eu, advogado público acima identificado, em conformidade com a PORTARIA INTERMINISTERIAL AGU/MF/BACEN Nº 1, de 26 de maio de 2020, DECLARO QUE:
+                    </p>
+                    <div className="space-y-2 text-sm">
+                      <label className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.atividades.declaracaoLeu}
+                          onChange={(e) => set("atividades", { ...data.atividades, declaracaoLeu: e.target.checked })}
+                          className="mt-1 h-4 w-4 accent-gov-blue"
+                        />
+                        <span>Li a Portaria Interministerial AGU/MF/BACEN Nº 1, de 26 de maio de 2020;</span>
+                      </label>
+                      <label className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.atividades.declaracaoVerdade}
+                          onChange={(e) => set("atividades", { ...data.atividades, declaracaoVerdade: e.target.checked })}
+                          className="mt-1 h-4 w-4 accent-gov-blue"
+                        />
+                        <span>As declarações de carga-horária aqui relatadas são expressão da verdade e, caso ocorram alterações definitivas na grade horária, comunicá-las-ei à chefia imediata;</span>
+                      </label>
+                      <label className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.atividades.declaracaoCiente}
+                          onChange={(e) => set("atividades", { ...data.atividades, declaracaoCiente: e.target.checked })}
+                          className="mt-1 h-4 w-4 accent-gov-blue"
+                        />
+                        <span>Estou ciente que a presente autorização será válida apenas para o atual semestre letivo, sendo necessária a apresentação de novo requerimento para os semestres subsequentes.</span>
+                      </label>
+                    </div>
+                    {(errors as Record<string, string>).declaracoes && (
+                      <p role="alert" className="mt-2 text-xs font-semibold text-gov-danger">
+                        {(errors as Record<string, string>).declaracoes}
+                      </p>
+                    )}
+                  </fieldset>
+                </div>
+              )}
+
 
               <div className="sm:col-span-2 flex justify-end gap-3 pt-2 border-t border-border">
                 <button

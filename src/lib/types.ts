@@ -2,6 +2,8 @@ export type Role = "SOLICITANTE" | "CHEFIA" | "COORDENADOR" | "SUPERADMIN";
 
 export type SolicitacaoStatus = "PENDENTE" | "APROVADA" | "RECUSADA";
 
+export type RecursoStatus = "PENDENTE" | "ACEITO" | "REJEITADO";
+
 export interface User {
   id: string;
   nome: string;
@@ -11,6 +13,26 @@ export interface User {
   emailPessoal?: string;
   origem?: "AD" | "MANUAL";
   ativo?: boolean;
+}
+
+export interface AtividadesEnsino {
+  horarios: Record<string, boolean>; // "MANHA-SEG" => true
+  disciplinas: string;
+  projetoPedagogico: string;
+  material: string;
+  avaliacoes: string;
+  declaracaoLeu: boolean;
+  declaracaoVerdade: boolean;
+  declaracaoCiente: boolean;
+}
+
+export interface Recurso {
+  texto: string;
+  dataSolicitacao: string;
+  status: RecursoStatus;
+  decisaoData?: string;
+  decisaoComentario?: string;
+  decididoPor?: string;
 }
 
 export interface Solicitacao {
@@ -35,9 +57,11 @@ export interface Solicitacao {
   tipoSolicitacao: "Solicitação" | "Correção";
   protocoloOriginal?: string;
   descricaoCorrecao?: string;
+  atividades?: AtividadesEnsino;
   status: SolicitacaoStatus;
   decisaoComentario?: string;
   justificativaRecusa?: string;
+  recurso?: Recurso;
   historico: HistoricoEvento[];
 }
 
@@ -80,7 +104,7 @@ export interface ADConfig {
   grupoCoordenacao: string;
   grupoSuperadmin: string;
   sincronizacaoAutomatica: boolean;
-  intervaloSincronizacao: number; // minutos
+  intervaloSincronizacao: number;
   ultimaSincronizacao?: string;
 }
 
@@ -107,21 +131,46 @@ export const CHEFIAS = [
   { id: "ch5", nome: "Dra. Juliana Ferreira", email: "juliana.ferreira@agu.gov.br" },
 ];
 
+export const DIAS_SEMANA = ["SEG","TER","QUA","QUI","SEX","SAB","DOM","ALT"] as const;
+export const DIAS_LABEL: Record<typeof DIAS_SEMANA[number], string> = {
+  SEG:"SEG", TER:"TER", QUA:"QUA", QUI:"QUI", SEX:"SEX", SAB:"SÁB", DOM:"DOM", ALT:"Dias Alternados",
+};
+export const TURNOS = ["MANHA","TARDE","NOITE","VARIAVEL"] as const;
+export const TURNOS_LABEL: Record<typeof TURNOS[number], string> = {
+  MANHA:"MANHÃ", TARDE:"TARDE", NOITE:"NOITE", VARIAVEL:"VARIÁVEL",
+};
+
+/** Soma `n` dias úteis (seg-sex) a partir de `from`. */
+export function addBusinessDays(from: Date, n: number): Date {
+  const d = new Date(from);
+  let added = 0;
+  while (added < n) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) added++;
+  }
+  return d;
+}
+
+/** Retorna true se ainda pode recorrer (até 5 dias úteis após a decisão) */
+export function dentroPrazoRecurso(dataDecisaoIso?: string): boolean {
+  if (!dataDecisaoIso) return false;
+  const limite = addBusinessDays(new Date(dataDecisaoIso), 5);
+  return new Date() <= limite;
+}
+
 export type MessagingProvider = "NONE" | "GOOGLE" | "MICROSOFT";
 
 export interface MessagingConfig {
   provider: MessagingProvider;
   habilitado: boolean;
   remetente: string;
-  // Google Workspace
   googleClientId: string;
   googleClientSecret: string;
   googleRefreshToken: string;
-  // Microsoft 365 / Graph
   msTenantId: string;
   msClientId: string;
   msClientSecret: string;
-  // Eventos
   notificarNovaSolicitacao: boolean;
   notificarDecisao: boolean;
   copiaSolicitante: boolean;

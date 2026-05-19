@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolicitanteRouteImport } from './routes/solicitante'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CoordenadorRouteImport } from './routes/coordenador'
 import { Route as ChefiaRouteImport } from './routes/chefia'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -22,7 +23,9 @@ import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
 import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
 import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
+import { Route as CoordenadorFaqRouteImport } from './routes/coordenador.faq'
 import { Route as CoordenadorAcessosRouteImport } from './routes/coordenador.acessos'
+import { Route as ChefiaRecursosRouteImport } from './routes/chefia.recursos'
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
@@ -34,6 +37,11 @@ import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id
 const SolicitanteRoute = SolicitanteRouteImport.update({
   id: '/solicitante',
   path: '/solicitante',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoordenadorRoute = CoordenadorRouteImport.update({
@@ -96,10 +104,20 @@ const CoordenadorRelatoriosRoute = CoordenadorRelatoriosRouteImport.update({
   path: '/relatorios',
   getParentRoute: () => CoordenadorRoute,
 } as any)
+const CoordenadorFaqRoute = CoordenadorFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => CoordenadorRoute,
+} as any)
 const CoordenadorAcessosRoute = CoordenadorAcessosRouteImport.update({
   id: '/acessos',
   path: '/acessos',
   getParentRoute: () => CoordenadorRoute,
+} as any)
+const ChefiaRecursosRoute = ChefiaRecursosRouteImport.update({
+  id: '/recursos',
+  path: '/recursos',
+  getParentRoute: () => ChefiaRoute,
 } as any)
 const ChefiaPendentesRoute = ChefiaPendentesRouteImport.update({
   id: '/pendentes',
@@ -142,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/chefia': typeof ChefiaRouteWithChildren
   '/coordenador': typeof CoordenadorRouteWithChildren
+  '/faq': typeof FaqRoute
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
@@ -149,7 +168,9 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/chefia/recursos': typeof ChefiaRecursosRoute
   '/coordenador/acessos': typeof CoordenadorAcessosRoute
+  '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
@@ -162,13 +183,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/faq': typeof FaqRoute
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/chefia/recursos': typeof ChefiaRecursosRoute
   '/coordenador/acessos': typeof CoordenadorAcessosRoute
+  '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
@@ -185,6 +209,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/chefia': typeof ChefiaRouteWithChildren
   '/coordenador': typeof CoordenadorRouteWithChildren
+  '/faq': typeof FaqRoute
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
@@ -192,7 +217,9 @@ export interface FileRoutesById {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
+  '/chefia/recursos': typeof ChefiaRecursosRoute
   '/coordenador/acessos': typeof CoordenadorAcessosRoute
+  '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
@@ -210,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/chefia'
     | '/coordenador'
+    | '/faq'
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
@@ -217,7 +245,9 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/chefia/recursos'
     | '/coordenador/acessos'
+    | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
@@ -230,13 +260,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/faq'
     | '/admin/acessos'
     | '/admin/ad'
     | '/admin/mensageria'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/chefia/recursos'
     | '/coordenador/acessos'
+    | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
@@ -252,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/chefia'
     | '/coordenador'
+    | '/faq'
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
@@ -259,7 +293,9 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
+    | '/chefia/recursos'
     | '/coordenador/acessos'
+    | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
     | '/solicitante/minhas'
@@ -276,6 +312,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ChefiaRoute: typeof ChefiaRouteWithChildren
   CoordenadorRoute: typeof CoordenadorRouteWithChildren
+  FaqRoute: typeof FaqRoute
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
 }
 
@@ -286,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/solicitante'
       fullPath: '/solicitante'
       preLoaderRoute: typeof SolicitanteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coordenador': {
@@ -372,12 +416,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoordenadorRelatoriosRouteImport
       parentRoute: typeof CoordenadorRoute
     }
+    '/coordenador/faq': {
+      id: '/coordenador/faq'
+      path: '/faq'
+      fullPath: '/coordenador/faq'
+      preLoaderRoute: typeof CoordenadorFaqRouteImport
+      parentRoute: typeof CoordenadorRoute
+    }
     '/coordenador/acessos': {
       id: '/coordenador/acessos'
       path: '/acessos'
       fullPath: '/coordenador/acessos'
       preLoaderRoute: typeof CoordenadorAcessosRouteImport
       parentRoute: typeof CoordenadorRoute
+    }
+    '/chefia/recursos': {
+      id: '/chefia/recursos'
+      path: '/recursos'
+      fullPath: '/chefia/recursos'
+      preLoaderRoute: typeof ChefiaRecursosRouteImport
+      parentRoute: typeof ChefiaRoute
     }
     '/chefia/pendentes': {
       id: '/chefia/pendentes'
@@ -452,6 +510,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface ChefiaRouteChildren {
   ChefiaHistoricoRoute: typeof ChefiaHistoricoRoute
   ChefiaPendentesRoute: typeof ChefiaPendentesRoute
+  ChefiaRecursosRoute: typeof ChefiaRecursosRoute
   ChefiaIndexRoute: typeof ChefiaIndexRoute
   ChefiaAnaliseIdRoute: typeof ChefiaAnaliseIdRoute
 }
@@ -459,6 +518,7 @@ interface ChefiaRouteChildren {
 const ChefiaRouteChildren: ChefiaRouteChildren = {
   ChefiaHistoricoRoute: ChefiaHistoricoRoute,
   ChefiaPendentesRoute: ChefiaPendentesRoute,
+  ChefiaRecursosRoute: ChefiaRecursosRoute,
   ChefiaIndexRoute: ChefiaIndexRoute,
   ChefiaAnaliseIdRoute: ChefiaAnaliseIdRoute,
 }
@@ -468,6 +528,7 @@ const ChefiaRouteWithChildren =
 
 interface CoordenadorRouteChildren {
   CoordenadorAcessosRoute: typeof CoordenadorAcessosRoute
+  CoordenadorFaqRoute: typeof CoordenadorFaqRoute
   CoordenadorRelatoriosRoute: typeof CoordenadorRelatoriosRoute
   CoordenadorTodasRoute: typeof CoordenadorTodasRoute
   CoordenadorIndexRoute: typeof CoordenadorIndexRoute
@@ -475,6 +536,7 @@ interface CoordenadorRouteChildren {
 
 const CoordenadorRouteChildren: CoordenadorRouteChildren = {
   CoordenadorAcessosRoute: CoordenadorAcessosRoute,
+  CoordenadorFaqRoute: CoordenadorFaqRoute,
   CoordenadorRelatoriosRoute: CoordenadorRelatoriosRoute,
   CoordenadorTodasRoute: CoordenadorTodasRoute,
   CoordenadorIndexRoute: CoordenadorIndexRoute,
@@ -505,18 +567,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ChefiaRoute: ChefiaRouteWithChildren,
   CoordenadorRoute: CoordenadorRouteWithChildren,
+  FaqRoute: FaqRoute,
   SolicitanteRoute: SolicitanteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

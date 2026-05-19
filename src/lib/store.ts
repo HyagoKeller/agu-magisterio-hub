@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { Solicitacao, SolicitacaoStatus } from "./types";
+import type { Solicitacao, SolicitacaoStatus, RecursoStatus } from "./types";
 
 const KEY = "agu_magisterio_solicitacoes_v2";
 
@@ -71,6 +71,54 @@ export const store = {
             }
           : s
       )
+    );
+  },
+  solicitarRecurso(id: string, texto: string, autor: string) {
+    const now = new Date().toISOString();
+    persist(
+      getAll().map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              recurso: { texto, dataSolicitacao: now, status: "PENDENTE" as RecursoStatus },
+              historico: [
+                ...s.historico,
+                { data: now, evento: "Recurso protocolado pelo solicitante", autor },
+              ],
+            }
+          : s
+      )
+    );
+  },
+  decidirRecurso(id: string, decisao: "ACEITO" | "REJEITADO", autor: string, comentario?: string) {
+    const now = new Date().toISOString();
+    persist(
+      getAll().map((s) => {
+        if (s.id !== id || !s.recurso) return s;
+        const recursoAceito = decisao === "ACEITO";
+        return {
+          ...s,
+          status: recursoAceito ? "APROVADA" : s.status,
+          dataDecisao: recursoAceito ? now : s.dataDecisao,
+          recurso: {
+            ...s.recurso,
+            status: decisao,
+            decisaoData: now,
+            decisaoComentario: comentario,
+            decididoPor: autor,
+          },
+          historico: [
+            ...s.historico,
+            {
+              data: now,
+              evento: recursoAceito
+                ? "Recurso aceito — solicitação reaprovada"
+                : "Recurso rejeitado pela chefia",
+              autor,
+            },
+          ],
+        };
+      })
     );
   },
 };

@@ -20,12 +20,14 @@ function CoordLayout() {
   return (
     <div className="min-h-screen bg-background">
       <GovHeader
-        perfilLabel="Coordenação CGU/AGU"
+        perfilLabel="Coordenação CGAU/AGU"
         nav={[
           { to: "/coordenador", label: "Dashboard" },
           { to: "/coordenador/todas", label: "Todas as Solicitações" },
           { to: "/coordenador/acessos", label: "Solicitações de Acesso" },
           { to: "/coordenador/relatorios", label: "Relatórios" },
+          { to: "/coordenador/faq", label: "Gestão da FAQ" },
+          { to: "/faq", label: "Dúvidas? FAQ" },
         ]}
       />
       <main><Outlet /></main>

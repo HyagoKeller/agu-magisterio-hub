@@ -38,7 +38,9 @@ function LoginPage() {
           <a href="https://aguservicos.agu.gov.br" target="_blank" rel="noreferrer" className="justify-self-center font-semibold hover:underline">
             Acesse já: aguservicos.agu.gov.br
           </a>
-          <span className="justify-self-end hidden sm:block opacity-90">Advocacia-Geral da União</span>
+          <a href="/faq" className="justify-self-end font-semibold hover:underline">
+            Dúvidas? Acesse nossa FAQ
+          </a>
         </div>
       </div>
 
@@ -191,7 +193,7 @@ function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
                       <span className="text-[11px] uppercase tracking-wide text-gov-blue font-semibold">Acesso restrito</span>
                     </span>
                     <span className="text-xs text-muted-foreground block mt-0.5">
-                      Coordenação CGU/AGU e Superadministrador (TI).
+                      Coordenação CGAU/AGU e Superadministrador (TI).
                     </span>
                     {isGestao && (
                       <select
@@ -201,7 +203,7 @@ function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
                         aria-label="Selecione o perfil de gestão"
                         className="mt-2 w-full rounded-md border border-input bg-card px-2.5 py-1.5 text-sm text-foreground focus:border-gov-blue"
                       >
-                        <option value="COORDENADOR">Coordenação CGU/AGU — indicadores e validações</option>
+                        <option value="COORDENADOR">Coordenação CGAU/AGU — indicadores e validações</option>
                         <option value="SUPERADMIN">Superadministrador (TI) — AD, usuários e grupos</option>
                       </select>
                     )}
