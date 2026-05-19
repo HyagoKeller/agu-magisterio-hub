@@ -22,11 +22,17 @@ type CardKey = "TOTAL" | "APROVADA" | "RECUSADA" | "PENDENTE";
 function isoStartOfDay(s: string) { return new Date(`${s}T00:00:00`).getTime(); }
 function isoEndOfDay(s: string) { return new Date(`${s}T23:59:59.999`).getTime(); }
 
-function defaultRange() {
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1);
+function defaultRange(all: { dataAbertura: string }[]) {
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  return { de: fmt(inicio), ate: fmt(hoje) };
+  const hoje = new Date();
+  if (!all.length) {
+    const ini = new Date(hoje.getFullYear() - 1, hoje.getMonth(), 1);
+    return { de: fmt(ini), ate: fmt(hoje) };
+  }
+  const datas = all.map((s) => new Date(s.dataAbertura).getTime());
+  const min = new Date(Math.min(...datas));
+  const max = new Date(Math.max(...datas, hoje.getTime()));
+  return { de: fmt(min), ate: fmt(max) };
 }
 
 function DashboardCoord() {
