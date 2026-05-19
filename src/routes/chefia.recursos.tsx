@@ -161,10 +161,14 @@ function AnaliseRecursoDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
           </button>
         </div>
         <div className="space-y-5 px-5 py-5">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Solicitante</div>
-            <div className="text-sm">{s.solicitanteNome} • {s.unidade}</div>
-          </div>
+          <details open className="rounded-md border border-border bg-muted/20">
+            <summary className="cursor-pointer px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gov-blue-dark">
+              Dados completos da solicitação
+            </summary>
+            <div className="border-t border-border bg-card px-3 py-4">
+              <SolicitacaoDetalhe s={s} showRecurso={false} />
+            </div>
+          </details>
 
           <GovMessage tone="danger" title="Justificativa da recusa original">
             {s.justificativaRecusa || "—"}
