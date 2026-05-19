@@ -241,11 +241,3 @@ function Analise() {
   );
 }
 
-function Info({ label, value, full }: { label: string; value: string; full?: boolean }) {
-  return (
-    <div className={full ? "sm:col-span-3" : ""}>
-      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-sm">{value}</dd>
-    </div>
-  );
-}
