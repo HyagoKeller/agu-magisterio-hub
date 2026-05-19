@@ -1,12 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { Clock, FileCheck2, FileX2, FilePlus2, Timer } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, FileCheck2, FilePlus2, FileX2, Timer, X } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
+import { StatusTag } from "@/components/StatusTag";
 import { useSolicitacoes } from "@/lib/store";
+import type { Solicitacao, SolicitacaoStatus } from "@/lib/types";
 
 export const Route = createFileRoute("/coordenador/")({
   head: () => ({ meta: [{ title: "Dashboard — Coordenação | Portal Magistério AGU" }] }),
@@ -15,46 +17,82 @@ export const Route = createFileRoute("/coordenador/")({
 
 const CORES = ["oklch(0.45 0.17 257)", "oklch(0.55 0.16 145)", "oklch(0.85 0.18 92)", "oklch(0.52 0.22 27)", "oklch(0.55 0.13 230)"];
 
+type CardKey = "TOTAL" | "APROVADA" | "RECUSADA" | "PENDENTE";
+
+function isoStartOfDay(s: string) { return new Date(`${s}T00:00:00`).getTime(); }
+function isoEndOfDay(s: string) { return new Date(`${s}T23:59:59.999`).getTime(); }
+
+function defaultRange() {
+  const hoje = new Date();
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  return { de: fmt(inicio), ate: fmt(hoje) };
+}
+
 function DashboardCoord() {
   const all = useSolicitacoes();
+  const { de: deDefault, ate: ateDefault } = defaultRange();
+  const [de, setDe] = useState(deDefault);
+  const [ate, setAte] = useState(ateDefault);
+  const [expandido, setExpandido] = useState<CardKey | null>(null);
+
+  const filtradas = useMemo(() => {
+    const ini = isoStartOfDay(de);
+    const fim = isoEndOfDay(ate);
+    return all.filter((s) => {
+      const t = new Date(s.dataAbertura).getTime();
+      return t >= ini && t <= fim;
+    });
+  }, [all, de, ate]);
 
   const stats = useMemo(() => {
-    const total = all.length;
-    const aprovadas = all.filter((s) => s.status === "APROVADA").length;
-    const recusadas = all.filter((s) => s.status === "RECUSADA").length;
-    const pendentes = all.filter((s) => s.status === "PENDENTE").length;
-    const decididas = all.filter((s) => s.dataDecisao);
+    const total = filtradas.length;
+    const aprovadas = filtradas.filter((s) => s.status === "APROVADA").length;
+    const recusadas = filtradas.filter((s) => s.status === "RECUSADA").length;
+    const pendentes = filtradas.filter((s) => s.status === "PENDENTE").length;
+    const decididas = filtradas.filter((s) => s.dataDecisao);
     const tempos = decididas.map((s) =>
       (new Date(s.dataDecisao!).getTime() - new Date(s.dataAbertura).getTime()) / 86400000
     );
     const media = tempos.length ? tempos.reduce((a, b) => a + b, 0) / tempos.length : 0;
     const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
     return { total, aprovadas, recusadas, pendentes, mediaDias: media, pctA: pct(aprovadas), pctR: pct(recusadas), pctP: pct(pendentes) };
-  }, [all]);
+  }, [filtradas]);
 
   const porUF = useMemo(() => {
     const m = new Map<string, number>();
-    all.forEach((s) => m.set(s.uf, (m.get(s.uf) || 0) + 1));
-    return [...m.entries()]
-      .map(([uf, total]) => ({ uf, total }))
-      .sort((a, b) => b.total - a.total);
-  }, [all]);
+    filtradas.forEach((s) => m.set(s.uf, (m.get(s.uf) || 0) + 1));
+    return [...m.entries()].map(([uf, total]) => ({ uf, total })).sort((a, b) => b.total - a.total);
+  }, [filtradas]);
 
   const porCargo = useMemo(() => {
     const m = new Map<string, number>();
-    all.forEach((s) => m.set(s.cargo, (m.get(s.cargo) || 0) + 1));
+    filtradas.forEach((s) => m.set(s.cargo, (m.get(s.cargo) || 0) + 1));
     return [...m.entries()].map(([name, value]) => ({ name, value }));
-  }, [all]);
+  }, [filtradas]);
 
   const evolucao = useMemo(() => {
     const m = new Map<string, number>();
-    all.forEach((s) => {
+    filtradas.forEach((s) => {
       const d = new Date(s.dataAbertura);
       const semana = `S${Math.ceil(d.getDate() / 7)}/${String(d.getMonth() + 1).padStart(2, "0")}`;
       m.set(semana, (m.get(semana) || 0) + 1);
     });
     return [...m.entries()].map(([semana, total]) => ({ semana, total }));
-  }, [all]);
+  }, [filtradas]);
+
+  const listaExpandida = useMemo<Solicitacao[]>(() => {
+    if (!expandido) return [];
+    const base = expandido === "TOTAL" ? filtradas : filtradas.filter((s) => s.status === expandido);
+    return [...base].sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura));
+  }, [expandido, filtradas]);
+
+  const aplicarPreset = (dias: number) => {
+    const hoje = new Date();
+    const ini = new Date(hoje); ini.setDate(hoje.getDate() - dias);
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+    setDe(fmt(ini)); setAte(fmt(hoje));
+  };
 
   return (
     <>
@@ -65,13 +103,102 @@ function DashboardCoord() {
           Visão consolidada das solicitações de magistério da AGU.
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
-          <Kpi label="Total no semestre" value={stats.total} Icon={FilePlus2} />
-          <Kpi label="% Aprovadas" value={`${stats.pctA}%`} subtitle={`${stats.aprovadas} solicitações`} Icon={FileCheck2} tone="text-gov-success" />
-          <Kpi label="% Recusadas" value={`${stats.pctR}%`} subtitle={`${stats.recusadas} solicitações`} Icon={FileX2} tone="text-gov-danger" />
-          <Kpi label="% Pendentes" value={`${stats.pctP}%`} subtitle={`${stats.pendentes} solicitações`} Icon={Clock} tone="text-gov-blue" />
-          <Kpi label="Média de aprovação" value={`${stats.mediaDias.toFixed(1)} d`} subtitle="dias úteis aproximados" Icon={Timer} />
+        <div className="gov-card mb-6">
+          <div className="flex flex-wrap items-end gap-4">
+            <div>
+              <label htmlFor="data-de" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">De</label>
+              <input id="data-de" type="date" value={de} onChange={(e) => setDe(e.target.value)} max={ate}
+                className="rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue" />
+            </div>
+            <div>
+              <label htmlFor="data-ate" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Até</label>
+              <input id="data-ate" type="date" value={ate} onChange={(e) => setAte(e.target.value)} min={de}
+                className="rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { l: "7 dias", d: 7 }, { l: "30 dias", d: 30 }, { l: "90 dias", d: 90 }, { l: "12 meses", d: 365 },
+              ].map((p) => (
+                <button key={p.l} onClick={() => aplicarPreset(p.d)}
+                  className="rounded-full border border-gov-blue px-3 py-1.5 text-xs font-semibold text-gov-blue hover:bg-accent">
+                  {p.l}
+                </button>
+              ))}
+            </div>
+            <div className="ml-auto text-xs text-muted-foreground">
+              {filtradas.length} {filtradas.length === 1 ? "solicitação no período" : "solicitações no período"}
+            </div>
+          </div>
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+          <KpiClick k="TOTAL" expandido={expandido} setExpandido={setExpandido}
+            label="Total no período" value={stats.total} Icon={FilePlus2} />
+          <KpiClick k="APROVADA" expandido={expandido} setExpandido={setExpandido}
+            label="% Aprovadas" value={`${stats.pctA}%`} subtitle={`${stats.aprovadas} solicitações`} Icon={FileCheck2} tone="text-gov-success" />
+          <KpiClick k="RECUSADA" expandido={expandido} setExpandido={setExpandido}
+            label="% Recusadas" value={`${stats.pctR}%`} subtitle={`${stats.recusadas} solicitações`} Icon={FileX2} tone="text-gov-danger" />
+          <KpiClick k="PENDENTE" expandido={expandido} setExpandido={setExpandido}
+            label="% Pendentes" value={`${stats.pctP}%`} subtitle={`${stats.pendentes} solicitações`} Icon={Clock} tone="text-gov-blue" />
+          <div className="gov-card">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Média de aprovação</span>
+              <Timer className="h-5 w-5 text-gov-blue-dark" />
+            </div>
+            <div className="mt-2 font-display text-3xl text-gov-blue-dark">{stats.mediaDias.toFixed(1)} d</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">dias úteis aproximados</div>
+          </div>
+        </div>
+
+        {expandido && (
+          <div className="gov-card mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-display text-lg">
+                {expandido === "TOTAL" && "Todas as solicitações do período"}
+                {expandido === "APROVADA" && "Solicitações aprovadas"}
+                {expandido === "RECUSADA" && "Solicitações recusadas"}
+                {expandido === "PENDENTE" && "Solicitações pendentes"}
+                <span className="ml-2 text-sm font-normal text-muted-foreground">({listaExpandida.length})</span>
+              </h2>
+              <button onClick={() => setExpandido(null)} aria-label="Fechar"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gov-blue-dark hover:bg-accent">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50 text-left">
+                    <Th>Protocolo</Th>
+                    <Th>Solicitante</Th>
+                    <Th>UF / Unidade</Th>
+                    <Th>Abertura</Th>
+                    <Th>Status</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listaExpandida.length === 0 && (
+                    <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">Nenhuma solicitação.</td></tr>
+                  )}
+                  {listaExpandida.slice(0, 50).map((s) => (
+                    <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+                      <Td><span className="font-semibold text-gov-blue-dark">{s.protocolo}</span></Td>
+                      <Td>{s.solicitanteNome}</Td>
+                      <Td className="text-xs">{s.uf} • {s.unidade}</Td>
+                      <Td className="text-xs">{new Date(s.dataAbertura).toLocaleDateString("pt-BR")}</Td>
+                      <Td><StatusTag status={s.status as SolicitacaoStatus} /></Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {listaExpandida.length > 50 && (
+                <div className="mt-3 text-center text-xs text-muted-foreground">
+                  Mostrando 50 de {listaExpandida.length}. <Link to="/coordenador/todas" className="font-semibold text-gov-blue hover:underline">Ver todas →</Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-2">
           <ChartCard title="Solicitações por UF">
@@ -115,19 +242,38 @@ function DashboardCoord() {
   );
 }
 
-function Kpi({ label, value, subtitle, Icon, tone = "text-gov-blue-dark" }: {
+function KpiClick({ k, expandido, setExpandido, label, value, subtitle, Icon, tone = "text-gov-blue-dark" }: {
+  k: CardKey; expandido: CardKey | null; setExpandido: (v: CardKey | null) => void;
   label: string; value: string | number; subtitle?: string; Icon: React.ComponentType<{ className?: string }>; tone?: string;
 }) {
+  const ativo = expandido === k;
   return (
-    <div className="gov-card">
+    <button
+      type="button"
+      onClick={() => setExpandido(ativo ? null : k)}
+      aria-expanded={ativo}
+      className={`gov-card text-left transition hover:shadow-md hover:-translate-y-0.5 ${ativo ? "ring-2 ring-gov-blue" : ""}`}
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
         <Icon className={`h-5 w-5 ${tone}`} />
       </div>
       <div className="mt-2 font-display text-3xl text-gov-blue-dark">{value}</div>
-      {subtitle && <div className="mt-0.5 text-xs text-muted-foreground">{subtitle}</div>}
-    </div>
+      <div className="mt-0.5 flex items-center justify-between">
+        {subtitle ? <span className="text-xs text-muted-foreground">{subtitle}</span> : <span />}
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-gov-blue">
+          {ativo ? "Recolher" : "Expandir"} {ativo ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        </span>
+      </div>
+    </button>
   );
+}
+
+function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <th className={`px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground ${className}`}>{children}</th>;
+}
+function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <td className={`px-3 py-3 align-middle ${className}`}>{children}</td>;
 }
 
 function ChartCard({ title, children, full }: { title: string; children: React.ReactNode; full?: boolean }) {
