@@ -114,6 +114,12 @@ function NovaSolicitacao() {
       e.chefiaNome = "Informe o nome completo da chefia imediata.";
     if (!data.chefiaEmail.trim()) e.chefiaEmail = "Informe o e-mail da chefia imediata.";
     else if (!isValidEmail(data.chefiaEmail)) e.chefiaEmail = "E-mail inválido.";
+    if (data.tipo === "Solicitação") {
+      const a = data.atividades;
+      const algumPreenchido = a.disciplinas.trim() || a.projetoPedagogico.trim() || a.material.trim() || a.avaliacoes.trim();
+      if (!algumPreenchido) (e as Record<string, string>).atividades = "Informe ao menos uma atividade de ensino.";
+      if (!a.declaracaoVerdade || !a.declaracaoCiente) (e as Record<string, string>).declaracoes = "Confirme as declarações obrigatórias de boa-fé.";
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -165,6 +171,7 @@ function NovaSolicitacao() {
       tipoSolicitacao: data.tipo,
       protocoloOriginal: data.tipo === "Correção" ? data.protocoloOriginal : undefined,
       descricaoCorrecao: data.tipo === "Correção" ? data.descricaoCorrecao : undefined,
+      atividades: data.tipo === "Solicitação" ? data.atividades : undefined,
       status: "PENDENTE",
       historico: [{
         data: now,
