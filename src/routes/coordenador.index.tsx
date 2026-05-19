@@ -93,12 +93,6 @@ function DashboardCoord() {
     return [...base].sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura));
   }, [expandido, filtradas]);
 
-  const aplicarPreset = (dias: number) => {
-    const hoje = new Date();
-    const ini = new Date(hoje); ini.setDate(hoje.getDate() - dias);
-    const fmt = (d: Date) => d.toISOString().slice(0, 10);
-    setDe(fmt(ini)); setAte(fmt(hoje));
-  };
 
   return (
     <>
