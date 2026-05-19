@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { StatusTag } from "@/components/StatusTag";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
+import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
 
