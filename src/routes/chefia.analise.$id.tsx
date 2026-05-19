@@ -4,6 +4,7 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { SolicitacaoDetalhe } from "@/components/SolicitacaoDetalhe";
 import { Modal } from "@/routes/solicitante.nova";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes, store } from "@/lib/store";
@@ -105,28 +106,8 @@ function Analise() {
         </h1>
         <p className="text-sm text-muted-foreground mb-6">Protocolo {s.protocolo} • {s.solicitanteNome}</p>
 
-        {s.tipoSolicitacao === "Correção" && (
-          <div className="mb-6">
-            <GovMessage tone="warning" title={`Correção referente ao protocolo ${s.protocoloOriginal ?? "—"}`}>
-              {s.descricaoCorrecao || "Sem descrição informada."}
-            </GovMessage>
-          </div>
-        )}
-
         <div className="gov-card mb-6">
-          <h2 className="font-display text-lg mb-4">Dados do solicitante</h2>
-          <dl className="grid gap-4 sm:grid-cols-3">
-            <Info label="Nome" value={s.solicitanteNome} full />
-            <Info label="CPF" value={s.cpf} />
-            <Info label="SIAPE" value={s.siape} />
-            <Info label="OAB" value={[s.oabNumero, s.oabUf].filter(Boolean).join(" / ") || "—"} />
-            <Info label="Cargo" value={s.cargo} full />
-            <Info label="UF" value={s.uf} />
-            <Info label="Unidade" value={s.unidade} />
-            <Info label="Formação" value={s.formacao || "—"} />
-            <Info label="Tipo" value={s.tipoSolicitacao} />
-            <Info label="Aberta em" value={new Date(s.dataAbertura).toLocaleString("pt-BR")} />
-          </dl>
+          <SolicitacaoDetalhe s={s} showHistorico={false} />
         </div>
 
         {readonly ? (
@@ -260,11 +241,3 @@ function Analise() {
   );
 }
 
-function Info({ label, value, full }: { label: string; value: string; full?: boolean }) {
-  return (
-    <div className={full ? "sm:col-span-3" : ""}>
-      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-sm">{value}</dd>
-    </div>
-  );
-}
