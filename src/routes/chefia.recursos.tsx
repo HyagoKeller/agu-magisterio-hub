@@ -150,7 +150,7 @@ function AnaliseRecursoDrawer({ s, onClose }: { s: Solicitacao; onClose: () => v
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={onClose}>
-      <aside className="h-full w-full max-w-lg overflow-y-auto bg-card shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <aside className="h-full w-full max-w-3xl overflow-y-auto bg-card shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <div className="text-xs text-muted-foreground">Recurso ao protocolo</div>
