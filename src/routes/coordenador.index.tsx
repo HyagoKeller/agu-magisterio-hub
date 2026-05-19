@@ -37,7 +37,7 @@ function defaultRange(all: { dataAbertura: string }[]) {
 
 function DashboardCoord() {
   const all = useSolicitacoes();
-  const { de: deDefault, ate: ateDefault } = defaultRange();
+  const { de: deDefault, ate: ateDefault } = useMemo(() => defaultRange(all), [all]);
   const [de, setDe] = useState(deDefault);
   const [ate, setAte] = useState(ateDefault);
   const [expandido, setExpandido] = useState<CardKey | null>(null);
