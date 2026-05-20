@@ -627,7 +627,6 @@ function NovaSolicitacao() {
                     )}
                   </fieldset>
                 </div>
-              )}
 
 
               <div className="sm:col-span-2 flex justify-end gap-3 pt-2 border-t border-border">
