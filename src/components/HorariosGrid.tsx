@@ -232,28 +232,35 @@ function CellEditor({
 
           <div className="rounded-md border border-border bg-muted/30 p-2.5">
             <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Vigência da atividade <span className="font-normal normal-case">— pode ultrapassar o semestre da declaração</span>
+              Vigência da atividade <span className="font-normal normal-case">— não pode ultrapassar o semestre da declaração{semestreInicio && semestreFim ? ` (${formatDateBR(semestreInicio)} a ${formatDateBR(semestreFim)})` : ""}</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs font-semibold mb-1">Data de início</label>
                 <input
                   type="date" value={dataInicio}
+                  min={semestreInicio || undefined}
+                  max={semestreFim || undefined}
                   onChange={(e) => setDataInicio(e.target.value)}
-                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums"
+                  className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${foraSemestreInicio ? "border-gov-danger" : "border-input"}`}
                 />
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1">Data de fim</label>
                 <input
-                  type="date" value={dataFim} min={dataInicio || undefined}
+                  type="date" value={dataFim}
+                  min={dataInicio || semestreInicio || undefined}
+                  max={semestreFim || undefined}
                   onChange={(e) => setDataFim(e.target.value)}
-                  className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${vigenciaInvalida ? "border-gov-danger" : "border-input"}`}
+                  className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${vigenciaInvalida || foraSemestreFim ? "border-gov-danger" : "border-input"}`}
                 />
               </div>
             </div>
             {vigenciaInvalida && (
               <p className="mt-1.5 text-[11px] font-semibold text-gov-danger">A data de fim deve ser igual ou posterior à data de início.</p>
+            )}
+            {foraSemestre && !vigenciaInvalida && (
+              <p className="mt-1.5 text-[11px] font-semibold text-gov-danger">A vigência deve estar dentro do semestre da declaração ({formatDateBR(semestreInicio)} a {formatDateBR(semestreFim)}).</p>
             )}
           </div>
           <div>
