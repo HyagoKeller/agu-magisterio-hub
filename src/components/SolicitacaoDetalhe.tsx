@@ -246,3 +246,20 @@ function Declar({ ok, texto }: { ok: boolean; texto: string }) {
     </li>
   );
 }
+
+/** Converte registros legados (`horarios: boolean`) para a nova `grade`. */
+function gradeFromAtividades(a: NonNullable<Solicitacao["atividades"]>): Grade {
+  if (a.grade && Object.keys(a.grade).length > 0) return a.grade;
+  const out: Grade = {};
+  if (a.horarios) {
+    for (const [key, v] of Object.entries(a.horarios)) {
+      if (!v) continue;
+      // ignora chaves do esquema antigo que tinham "ALT"/"VARIAVEL"
+      const [t, d] = key.split("-");
+      if (!["MANHA", "TARDE", "NOITE"].includes(t)) continue;
+      if (!["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"].includes(d)) continue;
+      out[key] = { horas: 0, frequencia: "SEMANAL" };
+    }
+  }
+  return out;
+}
