@@ -306,6 +306,11 @@ export function ResumoGrade({ grade }: { grade: Grade }) {
   const diasUnicos = new Set(Object.keys(grade).map((k) => k.split("-")[1])).size;
   const variaveis = entries.filter((c) => c.frequencia === "VARIAVEL").length;
 
+  const datasInicio = entries.map((c) => c.dataInicio).filter(Boolean) as string[];
+  const datasFim = entries.map((c) => c.dataFim).filter(Boolean) as string[];
+  const inicioMin = datasInicio.length ? datasInicio.sort()[0] : undefined;
+  const fimMax = datasFim.length ? datasFim.sort().slice(-1)[0] : undefined;
+
   return (
     <div className="rounded-md border border-border bg-card p-4">
       <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-gov-blue-dark">
@@ -315,6 +320,12 @@ export function ResumoGrade({ grade }: { grade: Grade }) {
         <Row label="Total de horas semanais" value={`${formatHoras(totalSemanal)}h`} highlight />
         <Row label="Dias da semana com atividades" value={`${diasUnicos} ${diasUnicos === 1 ? "dia" : "dias"}`} />
         <Row label="Atividades com frequência variável" value={`${variaveis} ${variaveis === 1 ? "registro" : "registros"}`} />
+        {(inicioMin || fimMax) && (
+          <Row
+            label="Vigência consolidada"
+            value={`${formatDateBR(inicioMin)} → ${formatDateBR(fimMax)}`}
+          />
+        )}
       </dl>
     </div>
   );
