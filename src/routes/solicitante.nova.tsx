@@ -4,7 +4,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
-import { HorariosGrid, ResumoGrade } from "@/components/HorariosGrid";
+import { HorariosGrid, ResumoGrade, boundsForSemestre } from "@/components/HorariosGrid";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
@@ -519,10 +519,20 @@ function NovaSolicitacao() {
                       Clique em uma célula para informar a carga horária e a frequência da atividade.
                     </p>
                     <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
-                      <HorariosGrid
-                        value={data.atividades.grade ?? {}}
-                        onChange={(g) => set("atividades", { ...data.atividades, grade: g })}
-                      />
+                      {(() => {
+                        const b = boundsForSemestre(
+                          data.atividades.anoReferencia ?? anoCorrente,
+                          (data.atividades.semestreReferencia ?? semestreCorrente) as 1 | 2,
+                        );
+                        return (
+                          <HorariosGrid
+                            value={data.atividades.grade ?? {}}
+                            onChange={(g) => set("atividades", { ...data.atividades, grade: g })}
+                            semestreInicio={b.inicio}
+                            semestreFim={b.fim}
+                          />
+                        );
+                      })()}
                       <ResumoGrade grade={data.atividades.grade ?? {}} />
                     </div>
                   </fieldset>
