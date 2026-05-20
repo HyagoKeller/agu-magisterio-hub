@@ -15,8 +15,47 @@ export interface User {
   ativo?: boolean;
 }
 
+export type Frequencia = "SEMANAL" | "QUINZENAL" | "MENSAL" | "VARIAVEL";
+
+export const FREQUENCIAS: Frequencia[] = ["SEMANAL", "QUINZENAL", "MENSAL", "VARIAVEL"];
+
+export const FREQUENCIA_LABEL: Record<Frequencia, string> = {
+  SEMANAL: "Semanal",
+  QUINZENAL: "Quinzenal",
+  MENSAL: "Mensal",
+  VARIAVEL: "Variável",
+};
+
+/** Cores (tokens hex utilizados no badge) — mapeadas a partir do design proposto. */
+export const FREQUENCIA_COR: Record<Frequencia, { bg: string; fg: string }> = {
+  SEMANAL:   { bg: "oklch(0.55 0.22 260)", fg: "#fff" }, // azul
+  QUINZENAL: { bg: "oklch(0.75 0.18 65)",  fg: "#1a1a1a" }, // laranja
+  MENSAL:    { bg: "oklch(0.7 0.18 150)",  fg: "#0f0f0f" }, // verde
+  VARIAVEL:  { bg: "oklch(0.6 0.22 305)",  fg: "#fff" }, // roxo
+};
+
+/** Peso para cálculo de carga horária SEMANAL equivalente. */
+export const FREQUENCIA_PESO: Record<Frequencia, number> = {
+  SEMANAL: 1,
+  QUINZENAL: 0.5,
+  MENSAL: 0.25,
+  VARIAVEL: 1,
+};
+
+export interface HorarioCelula {
+  horas: number;
+  frequencia: Frequencia;
+  observacao?: string;
+}
+
 export interface AtividadesEnsino {
-  horarios: Record<string, boolean>; // "MANHA-SEG" => true
+  /** @deprecated mantido apenas para retrocompatibilidade com registros antigos */
+  horarios?: Record<string, boolean>;
+  /** Nova grade: chave "TURNO-DIA" (ex: "MANHA-SEG") => detalhes do horário. */
+  grade?: Record<string, HorarioCelula>;
+  /** Período de referência do formulário. */
+  semestreReferencia?: 1 | 2;
+  anoReferencia?: number;
   disciplinas: string;
   projetoPedagogico: string;
   material: string;
@@ -131,13 +170,13 @@ export const CHEFIAS = [
   { id: "ch5", nome: "Dra. Juliana Ferreira", email: "juliana.ferreira@agu.gov.br" },
 ];
 
-export const DIAS_SEMANA = ["SEG","TER","QUA","QUI","SEX","SAB","DOM","ALT"] as const;
+export const DIAS_SEMANA = ["SEG","TER","QUA","QUI","SEX","SAB","DOM"] as const;
 export const DIAS_LABEL: Record<typeof DIAS_SEMANA[number], string> = {
-  SEG:"SEG", TER:"TER", QUA:"QUA", QUI:"QUI", SEX:"SEX", SAB:"SÁB", DOM:"DOM", ALT:"Dias Alternados",
+  SEG:"SEG", TER:"TER", QUA:"QUA", QUI:"QUI", SEX:"SEX", SAB:"SÁB", DOM:"DOM",
 };
-export const TURNOS = ["MANHA","TARDE","NOITE","VARIAVEL"] as const;
+export const TURNOS = ["MANHA","TARDE","NOITE"] as const;
 export const TURNOS_LABEL: Record<typeof TURNOS[number], string> = {
-  MANHA:"MANHÃ", TARDE:"TARDE", NOITE:"NOITE", VARIAVEL:"VARIÁVEL",
+  MANHA:"MANHÃ", TARDE:"TARDE", NOITE:"NOITE",
 };
 
 /** Soma `n` dias úteis (seg-sex) a partir de `from`. */

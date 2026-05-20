@@ -1,6 +1,6 @@
 import { GovMessage } from "@/components/GovMessage";
 import { StatusTag } from "@/components/StatusTag";
-import { DIAS_LABEL, DIAS_SEMANA, TURNOS, TURNOS_LABEL } from "@/lib/types";
+import { HorariosGrid, ResumoGrade, type Grade } from "@/components/HorariosGrid";
 import type { Solicitacao } from "@/lib/types";
 import { useSolicitacoes } from "@/lib/store";
 
@@ -144,40 +144,19 @@ export function SolicitacaoDetalhe({ s, showHistorico = true, showRecurso = true
         <section>
           <h3 className="mb-3 font-display text-base text-gov-blue-dark">Atividades de Ensino</h3>
 
+          {(s.atividades.semestreReferencia || s.atividades.anoReferencia) && (
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[oklch(0.96_0.03_300)] px-3 py-1 text-xs font-semibold text-gov-blue-dark">
+              📅 Período de referência: {s.atividades.semestreReferencia ?? "?"}º Semestre de {s.atividades.anoReferencia ?? "?"}
+            </div>
+          )}
+
           <div className="mb-4">
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-              Horários das disciplinas
+              Grade semanal de atividades
             </div>
-            <div className="overflow-x-auto rounded-md border border-border">
-              <table className="w-full text-xs">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-2 py-1.5"></th>
-                    {DIAS_SEMANA.map((d) => (
-                      <th key={d} className="px-2 py-1.5 font-semibold text-muted-foreground">{DIAS_LABEL[d]}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {TURNOS.map((t) => (
-                    <tr key={t} className="border-t border-border">
-                      <th className="px-2 py-2 text-left font-semibold text-gov-blue-dark">{TURNOS_LABEL[t]}</th>
-                      {DIAS_SEMANA.map((d) => {
-                        const marcado = !!s.atividades?.horarios?.[`${t}-${d}`];
-                        return (
-                          <td key={d} className="px-2 py-2 text-center">
-                            {marcado ? (
-                              <span className="inline-block h-3 w-3 rounded-sm bg-gov-blue" aria-label="ocupado" />
-                            ) : (
-                              <span className="text-muted-foreground/40">·</span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid gap-4 lg:grid-cols-[1fr_240px]">
+              <HorariosGrid value={gradeFromAtividades(s.atividades)} readOnly />
+              <ResumoGrade grade={gradeFromAtividades(s.atividades)} />
             </div>
           </div>
 
@@ -266,4 +245,21 @@ function Declar({ ok, texto }: { ok: boolean; texto: string }) {
       <span className={ok ? "text-foreground" : "text-muted-foreground"}>{texto}</span>
     </li>
   );
+}
+
+/** Converte registros legados (`horarios: boolean`) para a nova `grade`. */
+function gradeFromAtividades(a: NonNullable<Solicitacao["atividades"]>): Grade {
+  if (a.grade && Object.keys(a.grade).length > 0) return a.grade;
+  const out: Grade = {};
+  if (a.horarios) {
+    for (const [key, v] of Object.entries(a.horarios)) {
+      if (!v) continue;
+      // ignora chaves do esquema antigo que tinham "ALT"/"VARIAVEL"
+      const [t, d] = key.split("-");
+      if (!["MANHA", "TARDE", "NOITE"].includes(t)) continue;
+      if (!["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"].includes(d)) continue;
+      out[key] = { horas: 0, frequencia: "SEMANAL" };
+    }
+  }
+  return out;
 }

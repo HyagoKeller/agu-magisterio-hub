@@ -4,10 +4,11 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { HorariosGrid, ResumoGrade } from "@/components/HorariosGrid";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, DIAS_LABEL, DIAS_SEMANA, FORMACOES, TURNOS, TURNOS_LABEL, UFS, type AtividadesEnsino } from "@/lib/types";
+import { CARGOS, FORMACOES, UFS, type AtividadesEnsino } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
@@ -33,8 +34,13 @@ interface FormData {
   atividades: AtividadesEnsino;
 }
 
+const anoCorrente = new Date().getFullYear();
+const semestreCorrente: 1 | 2 = new Date().getMonth() < 6 ? 1 : 2;
+
 const emptyAtividades: AtividadesEnsino = {
-  horarios: {},
+  grade: {},
+  semestreReferencia: semestreCorrente,
+  anoReferencia: anoCorrente,
   disciplinas: "",
   projetoPedagogico: "",
   material: "",
@@ -476,47 +482,48 @@ function NovaSolicitacao() {
                   </p>
 
                   <fieldset className="rounded-md border border-border p-4">
-                    <legend className="px-2 text-sm font-semibold">Horários das Disciplinas</legend>
+                    <legend className="px-2 text-sm font-semibold">Período do Registro</legend>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Marque os turnos ocupados com atividades pelo docente neste semestre. "Variável" = horário; "Dias Alternados" = não semanal.
+                      Informe o semestre e o ano referente a este formulário — usado para futura emissão de certidões.
                     </p>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            {DIAS_SEMANA.map((d) => (
-                              <th key={d} className="px-2 py-1.5 font-semibold text-muted-foreground">{DIAS_LABEL[d]}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {TURNOS.map((t) => (
-                            <tr key={t} className="border-t border-border">
-                              <th className="px-2 py-2 text-left font-semibold text-gov-blue-dark">{TURNOS_LABEL[t]}</th>
-                              {DIAS_SEMANA.map((d) => {
-                                const key = `${t}-${d}`;
-                                return (
-                                  <td key={d} className="px-2 py-2 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={!!data.atividades.horarios[key]}
-                                      onChange={(e) =>
-                                        set("atividades", {
-                                          ...data.atividades,
-                                          horarios: { ...data.atividades.horarios, [key]: e.target.checked },
-                                        })
-                                      }
-                                      className="h-4 w-4 accent-gov-blue"
-                                      aria-label={`${TURNOS_LABEL[t]} ${DIAS_LABEL[d]}`}
-                                    />
-                                  </td>
-                                );
-                              })}
-                            </tr>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Semestre</label>
+                        <select
+                          value={data.atividades.semestreReferencia ?? semestreCorrente}
+                          onChange={(e) => set("atividades", { ...data.atividades, semestreReferencia: Number(e.target.value) as 1 | 2 })}
+                          className={inputCls(false)}
+                        >
+                          <option value={1}>1º Semestre</option>
+                          <option value={2}>2º Semestre</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Ano</label>
+                        <select
+                          value={data.atividades.anoReferencia ?? anoCorrente}
+                          onChange={(e) => set("atividades", { ...data.atividades, anoReferencia: Number(e.target.value) })}
+                          className={inputCls(false)}
+                        >
+                          {[anoCorrente - 1, anoCorrente, anoCorrente + 1].map((y) => (
+                            <option key={y} value={y}>{y}</option>
                           ))}
-                        </tbody>
-                      </table>
+                        </select>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="rounded-md border border-border p-4">
+                    <legend className="px-2 text-sm font-semibold">Grade Semanal de Atividades</legend>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Clique em uma célula para informar a carga horária e a frequência da atividade.
+                    </p>
+                    <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+                      <HorariosGrid
+                        value={data.atividades.grade ?? {}}
+                        onChange={(g) => set("atividades", { ...data.atividades, grade: g })}
+                      />
+                      <ResumoGrade grade={data.atividades.grade ?? {}} />
                     </div>
                   </fieldset>
 
