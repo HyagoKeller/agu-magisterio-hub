@@ -175,11 +175,15 @@ function CellEditor({
   const horasEfetivas = horasTouched || !horasCalculadas ? horas : String(horasCalculadas);
 
   const vigenciaInvalida = !!dataInicio && !!dataFim && dataFim < dataInicio;
+  const foraSemestreInicio = !!semestreInicio && !!semestreFim && !!dataInicio && (dataInicio < semestreInicio || dataInicio > semestreFim);
+  const foraSemestreFim = !!semestreInicio && !!semestreFim && !!dataFim && (dataFim < semestreInicio || dataFim > semestreFim);
+  const foraSemestre = foraSemestreInicio || foraSemestreFim;
 
   const submit = () => {
     if (!inicio || !fim) return;
     if (timeToMinutes(fim) <= timeToMinutes(inicio)) return;
     if (vigenciaInvalida) return;
+    if (foraSemestre) return;
     const h = Number((horasEfetivas || "0").replace(",", "."));
     if (!Number.isFinite(h) || h <= 0 || h > 24) return;
     onSave({
