@@ -218,6 +218,33 @@ function CellEditor({
           {intervaloInvalido && (
             <p className="text-[11px] font-semibold text-gov-danger">O horário de fim deve ser maior que o de início.</p>
           )}
+
+          <div className="rounded-md border border-border bg-muted/30 p-2.5">
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Vigência da atividade <span className="font-normal normal-case">— pode ultrapassar o semestre da declaração</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-semibold mb-1">Data de início</label>
+                <input
+                  type="date" value={dataInicio}
+                  onChange={(e) => setDataInicio(e.target.value)}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">Data de fim</label>
+                <input
+                  type="date" value={dataFim} min={dataInicio || undefined}
+                  onChange={(e) => setDataFim(e.target.value)}
+                  className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${vigenciaInvalida ? "border-gov-danger" : "border-input"}`}
+                />
+              </div>
+            </div>
+            {vigenciaInvalida && (
+              <p className="mt-1.5 text-[11px] font-semibold text-gov-danger">A data de fim deve ser igual ou posterior à data de início.</p>
+            )}
+          </div>
           <div>
             <label className="block text-xs font-semibold mb-1">
               Carga horária (h) <span className="font-normal text-muted-foreground">— calculada automaticamente</span>
