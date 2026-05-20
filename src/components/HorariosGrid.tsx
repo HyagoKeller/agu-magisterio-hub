@@ -310,7 +310,7 @@ function CellEditor({
           ) : <span />}
           <div className="flex gap-2">
             <button onClick={onCancel} className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold hover:bg-accent">Cancelar</button>
-            <button onClick={submit} className="rounded-full bg-gov-blue px-4 py-1.5 text-xs font-semibold text-white hover:bg-gov-blue-dark">Salvar</button>
+            <button onClick={submit} disabled={intervaloInvalido || vigenciaInvalida || foraSemestre} className="rounded-full bg-gov-blue px-4 py-1.5 text-xs font-semibold text-white hover:bg-gov-blue-dark disabled:opacity-50 disabled:cursor-not-allowed">Salvar</button>
           </div>
         </div>
       </div>
