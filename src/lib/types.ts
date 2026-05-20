@@ -49,9 +49,9 @@ export interface HorarioCelula {
   inicio?: string;
   /** Horário de término no formato "HH:MM" (ex.: "22:00"). */
   fim?: string;
-  /** Data de início da vigência da atividade (ISO "YYYY-MM-DD"). Pode ultrapassar o semestre. */
+  /** Data de início da vigência da atividade (ISO "YYYY-MM-DD"). Deve estar dentro do semestre da declaração. */
   dataInicio?: string;
-  /** Data de fim da vigência da atividade (ISO "YYYY-MM-DD"). Pode ultrapassar o semestre. */
+  /** Data de fim da vigência da atividade (ISO "YYYY-MM-DD"). Deve estar dentro do semestre da declaração. */
   dataFim?: string;
   observacao?: string;
 }
