@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { AtividadesEnsino, HorarioCelula, Solicitacao, SolicitacaoStatus, RecursoStatus } from "./types";
 
-const KEY = "agu_magisterio_solicitacoes_v3";
+const KEY = "agu_magisterio_solicitacoes_v4";
 
 function load(): Solicitacao[] {
   if (typeof window === "undefined") return seed();
@@ -143,8 +143,16 @@ function gerarProtocolo() {
 
 export { gerarProtocolo, semestreAtual };
 
-function cell(horas: number, frequencia: HorarioCelula["frequencia"], inicio?: string, fim?: string, observacao?: string): HorarioCelula {
-  return { horas, frequencia, inicio, fim, observacao };
+function cell(
+  horas: number,
+  frequencia: HorarioCelula["frequencia"],
+  inicio?: string,
+  fim?: string,
+  dataInicio?: string,
+  dataFim?: string,
+  observacao?: string
+): HorarioCelula {
+  return { horas, frequencia, inicio, fim, dataInicio, dataFim, observacao };
 }
 
 function atividades(opts: {
