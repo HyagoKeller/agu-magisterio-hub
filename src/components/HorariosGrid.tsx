@@ -357,3 +357,10 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
     </div>
   );
 }
+
+/** Retorna o intervalo ISO (YYYY-MM-DD) correspondente ao semestre da declaração. */
+export function boundsForSemestre(ano?: number, semestre?: 1 | 2): { inicio?: string; fim?: string } {
+  if (!ano || !semestre) return {};
+  if (semestre === 1) return { inicio: `${ano}-01-01`, fim: `${ano}-06-30` };
+  return { inicio: `${ano}-07-01`, fim: `${ano}-12-31` };
+}
