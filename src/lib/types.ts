@@ -45,6 +45,10 @@ export const FREQUENCIA_PESO: Record<Frequencia, number> = {
 export interface HorarioCelula {
   horas: number;
   frequencia: Frequencia;
+  /** Horário de início no formato "HH:MM" (ex.: "19:00"). */
+  inicio?: string;
+  /** Horário de término no formato "HH:MM" (ex.: "22:00"). */
+  fim?: string;
   observacao?: string;
 }
 
