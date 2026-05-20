@@ -91,11 +91,57 @@ function DashboardCoord() {
     return [...m.entries()].map(([semana, total]) => ({ semana, total }));
   }, [filtradas]);
 
+  // ====== Métricas de magistério (nova grade horária) ======
+  const comGrade = useMemo(
+    () => filtradas.filter((s) => s.atividades?.grade && Object.keys(s.atividades.grade).length > 0),
+    [filtradas]
+  );
+
+  const metricasGrade = useMemo(() => {
+    const totalDocentes = comGrade.length;
+    let somaSemanal = 0;
+    let totalCelulas = 0;
+    const porTurnoMap = new Map<string, number>();
+    const porDiaMap = new Map<string, number>();
+    const porFreqMap = new Map<string, number>();
+    const heat = new Map<string, number>(); // key: TURNO-DIA -> total horas equivalentes
+    const docenteHoras = new Map<string, number>();
+
+    comGrade.forEach((s) => {
+      let horasSemanaisDoc = 0;
+      Object.entries(s.atividades!.grade!).forEach(([key, cell]) => {
+        const [turno, dia] = key.split("-");
+        const peso = FREQUENCIA_PESO[cell.frequencia];
+        const eq = cell.horas * peso;
+        somaSemanal += eq;
+        horasSemanaisDoc += eq;
+        totalCelulas += 1;
+        porTurnoMap.set(turno, (porTurnoMap.get(turno) || 0) + eq);
+        porDiaMap.set(dia, (porDiaMap.get(dia) || 0) + eq);
+        porFreqMap.set(cell.frequencia, (porFreqMap.get(cell.frequencia) || 0) + 1);
+        heat.set(key, (heat.get(key) || 0) + eq);
+      });
+      docenteHoras.set(s.solicitanteNome, (docenteHoras.get(s.solicitanteNome) || 0) + horasSemanaisDoc);
+    });
+
+    const media = totalDocentes ? somaSemanal / totalDocentes : 0;
+    const porTurno = TURNOS.map((t) => ({ turno: TURNOS_LABEL[t], horas: Math.round((porTurnoMap.get(t) || 0) * 10) / 10 }));
+    const porDia = DIAS_SEMANA.map((d) => ({ dia: DIAS_LABEL[d], horas: Math.round((porDiaMap.get(d) || 0) * 10) / 10 }));
+    const porFreq = FREQUENCIAS.map((f) => ({ name: FREQUENCIA_LABEL[f], value: porFreqMap.get(f) || 0, color: FREQUENCIA_COR[f].bg }));
+    const topDocentes = [...docenteHoras.entries()]
+      .map(([nome, horas]) => ({ nome, horas: Math.round(horas * 10) / 10 }))
+      .sort((a, b) => b.horas - a.horas)
+      .slice(0, 5);
+
+    return { totalDocentes, somaSemanal: Math.round(somaSemanal * 10) / 10, media: Math.round(media * 10) / 10, totalCelulas, porTurno, porDia, porFreq, topDocentes, heat };
+  }, [comGrade]);
+
   const listaExpandida = useMemo<Solicitacao[]>(() => {
     if (!expandido) return [];
     const base = expandido === "TOTAL" ? filtradas : filtradas.filter((s) => s.status === expandido);
     return [...base].sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura));
   }, [expandido, filtradas]);
+
 
 
   return (
