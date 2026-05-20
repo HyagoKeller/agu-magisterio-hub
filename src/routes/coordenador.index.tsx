@@ -4,11 +4,15 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { ChevronDown, ChevronUp, Clock, FileCheck2, FilePlus2, FileX2, Timer, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, FileCheck2, FilePlus2, FileX2, GraduationCap, Sun, Timer, X } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { StatusTag } from "@/components/StatusTag";
 import { useSolicitacoes } from "@/lib/store";
-import type { Solicitacao, SolicitacaoStatus } from "@/lib/types";
+import {
+  DIAS_LABEL, DIAS_SEMANA, FREQUENCIAS, FREQUENCIA_COR, FREQUENCIA_LABEL, FREQUENCIA_PESO,
+  TURNOS, TURNOS_LABEL,
+  type Solicitacao, type SolicitacaoStatus,
+} from "@/lib/types";
 
 export const Route = createFileRoute("/coordenador/")({
   head: () => ({ meta: [{ title: "Dashboard — Coordenação | Portal Magistério AGU" }] }),
@@ -87,11 +91,57 @@ function DashboardCoord() {
     return [...m.entries()].map(([semana, total]) => ({ semana, total }));
   }, [filtradas]);
 
+  // ====== Métricas de magistério (nova grade horária) ======
+  const comGrade = useMemo(
+    () => filtradas.filter((s) => s.atividades?.grade && Object.keys(s.atividades.grade).length > 0),
+    [filtradas]
+  );
+
+  const metricasGrade = useMemo(() => {
+    const totalDocentes = comGrade.length;
+    let somaSemanal = 0;
+    let totalCelulas = 0;
+    const porTurnoMap = new Map<string, number>();
+    const porDiaMap = new Map<string, number>();
+    const porFreqMap = new Map<string, number>();
+    const heat = new Map<string, number>(); // key: TURNO-DIA -> total horas equivalentes
+    const docenteHoras = new Map<string, number>();
+
+    comGrade.forEach((s) => {
+      let horasSemanaisDoc = 0;
+      Object.entries(s.atividades!.grade!).forEach(([key, cell]) => {
+        const [turno, dia] = key.split("-");
+        const peso = FREQUENCIA_PESO[cell.frequencia];
+        const eq = cell.horas * peso;
+        somaSemanal += eq;
+        horasSemanaisDoc += eq;
+        totalCelulas += 1;
+        porTurnoMap.set(turno, (porTurnoMap.get(turno) || 0) + eq);
+        porDiaMap.set(dia, (porDiaMap.get(dia) || 0) + eq);
+        porFreqMap.set(cell.frequencia, (porFreqMap.get(cell.frequencia) || 0) + 1);
+        heat.set(key, (heat.get(key) || 0) + eq);
+      });
+      docenteHoras.set(s.solicitanteNome, (docenteHoras.get(s.solicitanteNome) || 0) + horasSemanaisDoc);
+    });
+
+    const media = totalDocentes ? somaSemanal / totalDocentes : 0;
+    const porTurno = TURNOS.map((t) => ({ turno: TURNOS_LABEL[t], horas: Math.round((porTurnoMap.get(t) || 0) * 10) / 10 }));
+    const porDia = DIAS_SEMANA.map((d) => ({ dia: DIAS_LABEL[d], horas: Math.round((porDiaMap.get(d) || 0) * 10) / 10 }));
+    const porFreq = FREQUENCIAS.map((f) => ({ name: FREQUENCIA_LABEL[f], value: porFreqMap.get(f) || 0, color: FREQUENCIA_COR[f].bg }));
+    const topDocentes = [...docenteHoras.entries()]
+      .map(([nome, horas]) => ({ nome, horas: Math.round(horas * 10) / 10 }))
+      .sort((a, b) => b.horas - a.horas)
+      .slice(0, 5);
+
+    return { totalDocentes, somaSemanal: Math.round(somaSemanal * 10) / 10, media: Math.round(media * 10) / 10, totalCelulas, porTurno, porDia, porFreq, topDocentes, heat };
+  }, [comGrade]);
+
   const listaExpandida = useMemo<Solicitacao[]>(() => {
     if (!expandido) return [];
     const base = expandido === "TOTAL" ? filtradas : filtradas.filter((s) => s.status === expandido);
     return [...base].sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura));
   }, [expandido, filtradas]);
+
 
 
   return (
@@ -227,8 +277,141 @@ function DashboardCoord() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+
+        {/* ===== Métricas de Magistério (carga horária) ===== */}
+        <div className="mt-10 mb-4 flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 text-gov-blue-dark" />
+          <h2 className="font-display text-xl">Métricas de Magistério</h2>
+          <span className="text-xs text-muted-foreground">— a partir da grade horária declarada</span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+          <Kpi label="Docentes com grade" value={metricasGrade.totalDocentes} subtitle={`${metricasGrade.totalCelulas} blocos de aula`} Icon={GraduationCap} />
+          <Kpi label="Carga semanal total" value={`${metricasGrade.somaSemanal}h`} subtitle="equivalente semanal (pesos por frequência)" Icon={Sun} />
+          <Kpi label="Média por docente" value={`${metricasGrade.media}h`} subtitle="por semana" Icon={Clock} />
+          <Kpi label="Frequência variável" value={metricasGrade.porFreq.find((f) => f.name === "Variável")?.value ?? 0} subtitle="registros não recorrentes" Icon={Timer} />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ChartCard title="Carga horária semanal por turno">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={metricasGrade.porTurno}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0 0)" />
+                <XAxis dataKey="turno" stroke="oklch(0.4 0 0)" fontSize={12} />
+                <YAxis stroke="oklch(0.4 0 0)" fontSize={12} />
+                <Tooltip formatter={(v: number) => `${v}h`} />
+                <Bar dataKey="horas" fill="oklch(0.55 0.22 260)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Carga horária semanal por dia">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={metricasGrade.porDia}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0 0)" />
+                <XAxis dataKey="dia" stroke="oklch(0.4 0 0)" fontSize={12} />
+                <YAxis stroke="oklch(0.4 0 0)" fontSize={12} />
+                <Tooltip formatter={(v: number) => `${v}h`} />
+                <Bar dataKey="horas" fill="oklch(0.7 0.18 150)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Distribuição por frequência">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={metricasGrade.porFreq} dataKey="value" nameKey="name" outerRadius={90} label>
+                  {metricasGrade.porFreq.map((f, i) => <Cell key={i} fill={f.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Top 5 docentes — carga semanal">
+            {metricasGrade.topDocentes.length === 0 ? (
+              <p className="py-10 text-center text-sm text-muted-foreground">Sem dados de grade neste período.</p>
+            ) : (
+              <ul className="space-y-2">
+                {metricasGrade.topDocentes.map((d, i) => {
+                  const max = metricasGrade.topDocentes[0]?.horas || 1;
+                  const pct = Math.round((d.horas / max) * 100);
+                  return (
+                    <li key={d.nome} className="text-sm">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="truncate font-semibold text-gov-blue-dark">{i + 1}. {d.nome}</span>
+                        <span className="tabular-nums text-xs font-semibold text-foreground">{d.horas}h</span>
+                      </div>
+                      <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
+                        <div className="h-full rounded-full bg-gov-blue" style={{ width: `${pct}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </ChartCard>
+
+          <ChartCard title="Mapa de calor — turnos × dias da semana" full>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr>
+                    <th className="px-2 py-2 text-left font-semibold text-muted-foreground">Turno</th>
+                    {DIAS_SEMANA.map((d) => (
+                      <th key={d} className="px-2 py-2 font-semibold text-muted-foreground">{DIAS_LABEL[d]}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {TURNOS.map((t) => (
+                    <tr key={t} className="border-t border-border">
+                      <th className="px-2 py-2 text-left font-semibold text-gov-blue-dark">{TURNOS_LABEL[t]}</th>
+                      {DIAS_SEMANA.map((d) => {
+                        const v = metricasGrade.heat.get(`${t}-${d}`) || 0;
+                        const maxHeat = Math.max(1, ...Array.from(metricasGrade.heat.values()));
+                        const intensity = v / maxHeat;
+                        return (
+                          <td key={d} className="px-1.5 py-1.5 text-center">
+                            <div
+                              className="mx-auto flex h-10 min-w-[44px] items-center justify-center rounded-md font-semibold tabular-nums"
+                              style={{
+                                background: v === 0 ? "oklch(0.96 0 0)" : `color-mix(in oklab, oklch(0.45 0.17 257) ${Math.round(intensity * 100)}%, white)`,
+                                color: intensity > 0.5 ? "#fff" : "oklch(0.3 0 0)",
+                              }}
+                              title={`${TURNOS_LABEL[t]} · ${DIAS_LABEL[d]}: ${Math.round(v * 10) / 10}h`}
+                            >
+                              {v === 0 ? "·" : `${Math.round(v * 10) / 10}h`}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Soma das cargas semanais equivalentes (peso: Semanal ×1, Quinzenal ×0,5, Mensal ×0,25, Variável ×1).
+              </p>
+            </div>
+          </ChartCard>
+        </div>
       </section>
     </>
+  );
+}
+
+function Kpi({ label, value, subtitle, Icon }: { label: string; value: string | number; subtitle?: string; Icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <div className="gov-card">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <Icon className="h-5 w-5 text-gov-blue-dark" />
+      </div>
+      <div className="mt-2 font-display text-3xl text-gov-blue-dark">{value}</div>
+      {subtitle && <div className="mt-0.5 text-xs text-muted-foreground">{subtitle}</div>}
+    </div>
   );
 }
 
