@@ -151,13 +151,15 @@ function computeHoras(inicio: string, fim: string): number | null {
 }
 
 function CellEditor({
-  initial, onSave, onCancel, onRemove, title,
+  initial, onSave, onCancel, onRemove, title, semestreInicio, semestreFim,
 }: {
   initial?: HorarioCelula;
   onSave: (c: HorarioCelula) => void;
   onCancel: () => void;
   onRemove?: () => void;
   title: string;
+  semestreInicio?: string;
+  semestreFim?: string;
 }) {
   const [inicio, setInicio] = useState<string>(initial?.inicio ?? "");
   const [fim, setFim] = useState<string>(initial?.fim ?? "");
