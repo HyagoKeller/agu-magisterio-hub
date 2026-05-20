@@ -1,6 +1,6 @@
 import { GovMessage } from "@/components/GovMessage";
 import { StatusTag } from "@/components/StatusTag";
-import { DIAS_LABEL, DIAS_SEMANA, TURNOS, TURNOS_LABEL } from "@/lib/types";
+import { HorariosGrid, ResumoGrade, type Grade } from "@/components/HorariosGrid";
 import type { Solicitacao } from "@/lib/types";
 import { useSolicitacoes } from "@/lib/store";
 
