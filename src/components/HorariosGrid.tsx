@@ -156,6 +156,8 @@ function CellEditor({
 }) {
   const [inicio, setInicio] = useState<string>(initial?.inicio ?? "");
   const [fim, setFim] = useState<string>(initial?.fim ?? "");
+  const [dataInicio, setDataInicio] = useState<string>(initial?.dataInicio ?? "");
+  const [dataFim, setDataFim] = useState<string>(initial?.dataFim ?? "");
   const [horas, setHoras] = useState<string>(initial ? String(initial.horas) : "");
   const [horasTouched, setHorasTouched] = useState(false);
   const [frequencia, setFrequencia] = useState<Frequencia>(initial?.frequencia ?? "SEMANAL");
@@ -165,14 +167,19 @@ function CellEditor({
   const horasCalculadas = computeHoras(inicio, fim);
   const horasEfetivas = horasTouched || !horasCalculadas ? horas : String(horasCalculadas);
 
+  const vigenciaInvalida = !!dataInicio && !!dataFim && dataFim < dataInicio;
+
   const submit = () => {
     if (!inicio || !fim) return;
     if (timeToMinutes(fim) <= timeToMinutes(inicio)) return;
+    if (vigenciaInvalida) return;
     const h = Number((horasEfetivas || "0").replace(",", "."));
     if (!Number.isFinite(h) || h <= 0 || h > 24) return;
     onSave({
       horas: h, frequencia,
       inicio, fim,
+      dataInicio: dataInicio || undefined,
+      dataFim: dataFim || undefined,
       observacao: obs.trim() || undefined,
     });
   };
