@@ -120,7 +120,7 @@ function NovaSolicitacao() {
       e.chefiaNome = "Informe o nome completo da chefia imediata.";
     if (!data.chefiaEmail.trim()) e.chefiaEmail = "Informe o e-mail da chefia imediata.";
     else if (!isValidEmail(data.chefiaEmail)) e.chefiaEmail = "E-mail inválido.";
-    if (data.tipo === "Solicitação") {
+    {
       const a = data.atividades;
       const algumPreenchido = a.disciplinas.trim() || a.projetoPedagogico.trim() || a.material.trim() || a.avaliacoes.trim();
       if (!algumPreenchido) (e as Record<string, string>).atividades = "Informe ao menos uma atividade de ensino.";
@@ -146,6 +146,7 @@ function NovaSolicitacao() {
       chefiaNome: orig.chefiaNome,
       chefiaEmail: orig.chefiaEmail || "",
       formacao: orig.formacao || "",
+      atividades: orig.atividades ? { ...orig.atividades } : d.atividades,
     }));
   };
 
@@ -472,13 +473,14 @@ function NovaSolicitacao() {
                 </select>
               </Field>
 
-              {data.tipo === "Solicitação" && (
-                <div className="sm:col-span-2 space-y-4">
+              <div className="sm:col-span-2 space-y-4">
                   <div className="rounded-md bg-gov-blue-dark px-4 py-2.5 text-sm font-semibold uppercase tracking-wider text-white">
                     Atividades de Ensino
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    As informações abaixo serão encaminhadas à sua chefia imediata.
+                    {data.tipo === "Correção"
+                      ? "Os dados abaixo foram pré-preenchidos com a solicitação original. Ajuste qualquer campo que precise ser corrigido."
+                      : "As informações abaixo serão encaminhadas à sua chefia imediata."}
                   </p>
 
                   <fieldset className="rounded-md border border-border p-4">
@@ -625,7 +627,6 @@ function NovaSolicitacao() {
                     )}
                   </fieldset>
                 </div>
-              )}
 
 
               <div className="sm:col-span-2 flex justify-end gap-3 pt-2 border-t border-border">
