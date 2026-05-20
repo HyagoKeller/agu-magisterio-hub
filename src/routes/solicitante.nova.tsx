@@ -4,7 +4,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
-import { HorariosGrid, ResumoGrade } from "@/components/HorariosGrid";
+import { HorariosGrid, ResumoGrade, boundsForSemestre } from "@/components/HorariosGrid";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
