@@ -19,9 +19,12 @@ interface Props {
   value: Grade;
   onChange?: (g: Grade) => void;
   readOnly?: boolean;
+  /** Limites do semestre da declaração — vigência não pode ultrapassar. */
+  semestreInicio?: string; // ISO YYYY-MM-DD
+  semestreFim?: string;    // ISO YYYY-MM-DD
 }
 
-export function HorariosGrid({ value, onChange, readOnly = false }: Props) {
+export function HorariosGrid({ value, onChange, readOnly = false, semestreInicio, semestreFim }: Props) {
   const [editing, setEditing] = useState<string | null>(null);
 
   const setCell = (key: string, cell: HorarioCelula | null) => {
