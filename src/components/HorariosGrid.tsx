@@ -58,11 +58,14 @@ export function HorariosGrid({ value, onChange, readOnly = false }: Props) {
                           type="button"
                           disabled={readOnly}
                           onClick={() => !readOnly && setEditing(key)}
-                          className="group inline-flex flex-col items-center justify-center min-w-[64px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
+                          className="group inline-flex flex-col items-center justify-center min-w-[72px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
                           style={{ background: FREQUENCIA_COR[cell.frequencia].bg, color: FREQUENCIA_COR[cell.frequencia].fg }}
-                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}`}
+                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}${cell.inicio ? ` das ${cell.inicio} às ${cell.fim}` : ""}`}
                         >
                           <span className="text-sm font-bold">{formatHoras(cell.horas)}h</span>
+                          {cell.inicio && cell.fim && (
+                            <span className="opacity-95 text-[10px] tabular-nums">{cell.inicio}–{cell.fim}</span>
+                          )}
                           <span className="opacity-90">{FREQUENCIA_LABEL[cell.frequencia]}</span>
                         </button>
                       ) : readOnly ? (
