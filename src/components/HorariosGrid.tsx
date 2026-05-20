@@ -121,6 +121,18 @@ function formatHoras(h: number) {
   return Number.isInteger(h) ? String(h) : h.toFixed(1).replace(".", ",");
 }
 
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function computeHoras(inicio: string, fim: string): number | null {
+  if (!inicio || !fim) return null;
+  const diff = timeToMinutes(fim) - timeToMinutes(inicio);
+  if (diff <= 0) return null;
+  return Math.round((diff / 60) * 2) / 2; // arredonda em 0,5
+}
+
 function CellEditor({
   initial, onSave, onCancel, onRemove, title,
 }: {
