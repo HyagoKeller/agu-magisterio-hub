@@ -58,11 +58,14 @@ export function HorariosGrid({ value, onChange, readOnly = false }: Props) {
                           type="button"
                           disabled={readOnly}
                           onClick={() => !readOnly && setEditing(key)}
-                          className="group inline-flex flex-col items-center justify-center min-w-[64px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
+                          className="group inline-flex flex-col items-center justify-center min-w-[72px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
                           style={{ background: FREQUENCIA_COR[cell.frequencia].bg, color: FREQUENCIA_COR[cell.frequencia].fg }}
-                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}`}
+                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}${cell.inicio ? ` das ${cell.inicio} às ${cell.fim}` : ""}`}
                         >
                           <span className="text-sm font-bold">{formatHoras(cell.horas)}h</span>
+                          {cell.inicio && cell.fim && (
+                            <span className="opacity-95 text-[10px] tabular-nums">{cell.inicio}–{cell.fim}</span>
+                          )}
                           <span className="opacity-90">{FREQUENCIA_LABEL[cell.frequencia]}</span>
                         </button>
                       ) : readOnly ? (
@@ -118,6 +121,18 @@ function formatHoras(h: number) {
   return Number.isInteger(h) ? String(h) : h.toFixed(1).replace(".", ",");
 }
 
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function computeHoras(inicio: string, fim: string): number | null {
+  if (!inicio || !fim) return null;
+  const diff = timeToMinutes(fim) - timeToMinutes(inicio);
+  if (diff <= 0) return null;
+  return Math.round((diff / 60) * 2) / 2; // arredonda em 0,5
+}
+
 function CellEditor({
   initial, onSave, onCancel, onRemove, title,
 }: {
@@ -127,15 +142,30 @@ function CellEditor({
   onRemove?: () => void;
   title: string;
 }) {
-  const [horas, setHoras] = useState<string>(initial ? String(initial.horas) : "1");
+  const [inicio, setInicio] = useState<string>(initial?.inicio ?? "");
+  const [fim, setFim] = useState<string>(initial?.fim ?? "");
+  const [horas, setHoras] = useState<string>(initial ? String(initial.horas) : "");
+  const [horasTouched, setHorasTouched] = useState(false);
   const [frequencia, setFrequencia] = useState<Frequencia>(initial?.frequencia ?? "SEMANAL");
   const [obs, setObs] = useState(initial?.observacao ?? "");
 
+  // Calcula horas automaticamente a partir de início/fim (se o usuário não tiver editado manualmente)
+  const horasCalculadas = computeHoras(inicio, fim);
+  const horasEfetivas = horasTouched || !horasCalculadas ? horas : String(horasCalculadas);
+
   const submit = () => {
-    const h = Number(horas.replace(",", "."));
+    if (!inicio || !fim) return;
+    if (timeToMinutes(fim) <= timeToMinutes(inicio)) return;
+    const h = Number((horasEfetivas || "0").replace(",", "."));
     if (!Number.isFinite(h) || h <= 0 || h > 24) return;
-    onSave({ horas: h, frequencia, observacao: obs.trim() || undefined });
+    onSave({
+      horas: h, frequencia,
+      inicio, fim,
+      observacao: obs.trim() || undefined,
+    });
   };
+
+  const intervaloInvalido = !!inicio && !!fim && timeToMinutes(fim) <= timeToMinutes(inicio);
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onCancel}>
@@ -148,12 +178,35 @@ function CellEditor({
         </div>
 
         <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-semibold mb-1">Início</label>
+              <input
+                type="time" value={inicio}
+                onChange={(e) => setInicio(e.target.value)}
+                className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1">Fim</label>
+              <input
+                type="time" value={fim}
+                onChange={(e) => setFim(e.target.value)}
+                className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${intervaloInvalido ? "border-gov-danger" : "border-input"}`}
+              />
+            </div>
+          </div>
+          {intervaloInvalido && (
+            <p className="text-[11px] font-semibold text-gov-danger">O horário de fim deve ser maior que o de início.</p>
+          )}
           <div>
-            <label className="block text-xs font-semibold mb-1">Carga horária (h)</label>
+            <label className="block text-xs font-semibold mb-1">
+              Carga horária (h) <span className="font-normal text-muted-foreground">— calculada automaticamente</span>
+            </label>
             <input
               type="number" step="0.5" min={0.5} max={24}
-              value={horas}
-              onChange={(e) => setHoras(e.target.value)}
+              value={horasEfetivas}
+              onChange={(e) => { setHorasTouched(true); setHoras(e.target.value); }}
               className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue"
             />
           </div>

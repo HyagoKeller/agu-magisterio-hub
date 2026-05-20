@@ -505,7 +505,7 @@ function NovaSolicitacao() {
                           onChange={(e) => set("atividades", { ...data.atividades, anoReferencia: Number(e.target.value) })}
                           className={inputCls(false)}
                         >
-                          {[anoCorrente - 1, anoCorrente, anoCorrente + 1].map((y) => (
+                          {[anoCorrente, anoCorrente + 1, anoCorrente + 2].map((y) => (
                             <option key={y} value={y}>{y}</option>
                           ))}
                         </select>
