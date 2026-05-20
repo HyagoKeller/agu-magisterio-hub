@@ -4,11 +4,15 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { ChevronDown, ChevronUp, Clock, FileCheck2, FilePlus2, FileX2, Timer, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, FileCheck2, FilePlus2, FileX2, GraduationCap, Sun, Timer, X } from "lucide-react";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { StatusTag } from "@/components/StatusTag";
 import { useSolicitacoes } from "@/lib/store";
-import type { Solicitacao, SolicitacaoStatus } from "@/lib/types";
+import {
+  DIAS_LABEL, DIAS_SEMANA, FREQUENCIAS, FREQUENCIA_COR, FREQUENCIA_LABEL, FREQUENCIA_PESO,
+  TURNOS, TURNOS_LABEL,
+  type Solicitacao, type SolicitacaoStatus,
+} from "@/lib/types";
 
 export const Route = createFileRoute("/coordenador/")({
   head: () => ({ meta: [{ title: "Dashboard — Coordenação | Portal Magistério AGU" }] }),
