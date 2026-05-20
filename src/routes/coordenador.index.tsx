@@ -277,8 +277,141 @@ function DashboardCoord() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+
+        {/* ===== Métricas de Magistério (carga horária) ===== */}
+        <div className="mt-10 mb-4 flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 text-gov-blue-dark" />
+          <h2 className="font-display text-xl">Métricas de Magistério</h2>
+          <span className="text-xs text-muted-foreground">— a partir da grade horária declarada</span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+          <Kpi label="Docentes com grade" value={metricasGrade.totalDocentes} subtitle={`${metricasGrade.totalCelulas} blocos de aula`} Icon={GraduationCap} />
+          <Kpi label="Carga semanal total" value={`${metricasGrade.somaSemanal}h`} subtitle="equivalente semanal (pesos por frequência)" Icon={Sun} />
+          <Kpi label="Média por docente" value={`${metricasGrade.media}h`} subtitle="por semana" Icon={Clock} />
+          <Kpi label="Frequência variável" value={metricasGrade.porFreq.find((f) => f.name === "Variável")?.value ?? 0} subtitle="registros não recorrentes" Icon={Timer} />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ChartCard title="Carga horária semanal por turno">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={metricasGrade.porTurno}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0 0)" />
+                <XAxis dataKey="turno" stroke="oklch(0.4 0 0)" fontSize={12} />
+                <YAxis stroke="oklch(0.4 0 0)" fontSize={12} />
+                <Tooltip formatter={(v: number) => `${v}h`} />
+                <Bar dataKey="horas" fill="oklch(0.55 0.22 260)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Carga horária semanal por dia">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={metricasGrade.porDia}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0 0)" />
+                <XAxis dataKey="dia" stroke="oklch(0.4 0 0)" fontSize={12} />
+                <YAxis stroke="oklch(0.4 0 0)" fontSize={12} />
+                <Tooltip formatter={(v: number) => `${v}h`} />
+                <Bar dataKey="horas" fill="oklch(0.7 0.18 150)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Distribuição por frequência">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={metricasGrade.porFreq} dataKey="value" nameKey="name" outerRadius={90} label>
+                  {metricasGrade.porFreq.map((f, i) => <Cell key={i} fill={f.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Top 5 docentes — carga semanal">
+            {metricasGrade.topDocentes.length === 0 ? (
+              <p className="py-10 text-center text-sm text-muted-foreground">Sem dados de grade neste período.</p>
+            ) : (
+              <ul className="space-y-2">
+                {metricasGrade.topDocentes.map((d, i) => {
+                  const max = metricasGrade.topDocentes[0]?.horas || 1;
+                  const pct = Math.round((d.horas / max) * 100);
+                  return (
+                    <li key={d.nome} className="text-sm">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="truncate font-semibold text-gov-blue-dark">{i + 1}. {d.nome}</span>
+                        <span className="tabular-nums text-xs font-semibold text-foreground">{d.horas}h</span>
+                      </div>
+                      <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
+                        <div className="h-full rounded-full bg-gov-blue" style={{ width: `${pct}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </ChartCard>
+
+          <ChartCard title="Mapa de calor — turnos × dias da semana" full>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr>
+                    <th className="px-2 py-2 text-left font-semibold text-muted-foreground">Turno</th>
+                    {DIAS_SEMANA.map((d) => (
+                      <th key={d} className="px-2 py-2 font-semibold text-muted-foreground">{DIAS_LABEL[d]}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {TURNOS.map((t) => (
+                    <tr key={t} className="border-t border-border">
+                      <th className="px-2 py-2 text-left font-semibold text-gov-blue-dark">{TURNOS_LABEL[t]}</th>
+                      {DIAS_SEMANA.map((d) => {
+                        const v = metricasGrade.heat.get(`${t}-${d}`) || 0;
+                        const maxHeat = Math.max(1, ...Array.from(metricasGrade.heat.values()));
+                        const intensity = v / maxHeat;
+                        return (
+                          <td key={d} className="px-1.5 py-1.5 text-center">
+                            <div
+                              className="mx-auto flex h-10 min-w-[44px] items-center justify-center rounded-md font-semibold tabular-nums"
+                              style={{
+                                background: v === 0 ? "oklch(0.96 0 0)" : `color-mix(in oklab, oklch(0.45 0.17 257) ${Math.round(intensity * 100)}%, white)`,
+                                color: intensity > 0.5 ? "#fff" : "oklch(0.3 0 0)",
+                              }}
+                              title={`${TURNOS_LABEL[t]} · ${DIAS_LABEL[d]}: ${Math.round(v * 10) / 10}h`}
+                            >
+                              {v === 0 ? "·" : `${Math.round(v * 10) / 10}h`}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Soma das cargas semanais equivalentes (peso: Semanal ×1, Quinzenal ×0,5, Mensal ×0,25, Variável ×1).
+              </p>
+            </div>
+          </ChartCard>
+        </div>
       </section>
     </>
+  );
+}
+
+function Kpi({ label, value, subtitle, Icon }: { label: string; value: string | number; subtitle?: string; Icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <div className="gov-card">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <Icon className="h-5 w-5 text-gov-blue-dark" />
+      </div>
+      <div className="mt-2 font-display text-3xl text-gov-blue-dark">{value}</div>
+      {subtitle && <div className="mt-0.5 text-xs text-muted-foreground">{subtitle}</div>}
+    </div>
   );
 }
 
