@@ -4,10 +4,11 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { GovBreadcrumb } from "@/components/GovHeader";
 import { GovMessage } from "@/components/GovMessage";
+import { HorariosGrid, ResumoGrade } from "@/components/HorariosGrid";
 import { useAuth } from "@/lib/auth";
 import { gerarProtocolo, semestreAtual, store, useSolicitacoes } from "@/lib/store";
 import { dispatchNotification } from "@/lib/messaging-store";
-import { CARGOS, DIAS_LABEL, DIAS_SEMANA, FORMACOES, TURNOS, TURNOS_LABEL, UFS, type AtividadesEnsino } from "@/lib/types";
+import { CARGOS, FORMACOES, UFS, type AtividadesEnsino } from "@/lib/types";
 
 export const Route = createFileRoute("/solicitante/nova")({
   head: () => ({
@@ -33,8 +34,13 @@ interface FormData {
   atividades: AtividadesEnsino;
 }
 
+const anoCorrente = new Date().getFullYear();
+const semestreCorrente: 1 | 2 = new Date().getMonth() < 6 ? 1 : 2;
+
 const emptyAtividades: AtividadesEnsino = {
-  horarios: {},
+  grade: {},
+  semestreReferencia: semestreCorrente,
+  anoReferencia: anoCorrente,
   disciplinas: "",
   projetoPedagogico: "",
   material: "",
