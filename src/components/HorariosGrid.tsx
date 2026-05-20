@@ -114,6 +114,8 @@ export function HorariosGrid({ value, onChange, readOnly = false, semestreInicio
           onSave={(c) => { setCell(editing, c); setEditing(null); }}
           onRemove={value[editing] ? () => { setCell(editing, null); setEditing(null); } : undefined}
           title={cellTitle(editing)}
+          semestreInicio={semestreInicio}
+          semestreFim={semestreFim}
         />
       )}
     </div>
