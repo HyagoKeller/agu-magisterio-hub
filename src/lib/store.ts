@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
-import type { Solicitacao, SolicitacaoStatus, RecursoStatus } from "./types";
+import type { AtividadesEnsino, HorarioCelula, Solicitacao, SolicitacaoStatus, RecursoStatus } from "./types";
 
-const KEY = "agu_magisterio_solicitacoes_v2";
+const KEY = "agu_magisterio_solicitacoes_v3";
 
 function load(): Solicitacao[] {
   if (typeof window === "undefined") return seed();
