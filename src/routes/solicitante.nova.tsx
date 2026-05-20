@@ -146,6 +146,7 @@ function NovaSolicitacao() {
       chefiaNome: orig.chefiaNome,
       chefiaEmail: orig.chefiaEmail || "",
       formacao: orig.formacao || "",
+      atividades: orig.atividades ? { ...orig.atividades } : d.atividades,
     }));
   };
 
