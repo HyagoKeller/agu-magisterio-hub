@@ -126,6 +126,13 @@ function formatHoras(h: number) {
   return Number.isInteger(h) ? String(h) : h.toFixed(1).replace(".", ",");
 }
 
+function formatDateBR(iso?: string): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y.slice(2)}`;
+}
+
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(":").map(Number);
   return (h || 0) * 60 + (m || 0);
