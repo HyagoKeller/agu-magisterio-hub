@@ -58,15 +58,20 @@ export function HorariosGrid({ value, onChange, readOnly = false }: Props) {
                           type="button"
                           disabled={readOnly}
                           onClick={() => !readOnly && setEditing(key)}
-                          className="group inline-flex flex-col items-center justify-center min-w-[72px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
+                          className="group inline-flex flex-col items-center justify-center min-w-[88px] rounded-md px-2 py-1.5 text-[11px] font-semibold leading-tight shadow-sm"
                           style={{ background: FREQUENCIA_COR[cell.frequencia].bg, color: FREQUENCIA_COR[cell.frequencia].fg }}
-                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}${cell.inicio ? ` das ${cell.inicio} às ${cell.fim}` : ""}`}
+                          aria-label={`${cell.horas}h ${FREQUENCIA_LABEL[cell.frequencia]}${cell.inicio ? ` das ${cell.inicio} às ${cell.fim}` : ""}${cell.dataInicio ? ` vigência ${cell.dataInicio} a ${cell.dataFim ?? ""}` : ""}`}
                         >
                           <span className="text-sm font-bold">{formatHoras(cell.horas)}h</span>
                           {cell.inicio && cell.fim && (
                             <span className="opacity-95 text-[10px] tabular-nums">{cell.inicio}–{cell.fim}</span>
                           )}
                           <span className="opacity-90">{FREQUENCIA_LABEL[cell.frequencia]}</span>
+                          {(cell.dataInicio || cell.dataFim) && (
+                            <span className="mt-0.5 opacity-90 text-[9px] tabular-nums">
+                              {formatDateBR(cell.dataInicio)}→{formatDateBR(cell.dataFim)}
+                            </span>
+                          )}
                         </button>
                       ) : readOnly ? (
                         <span className="text-muted-foreground/40">·</span>
@@ -121,6 +126,13 @@ function formatHoras(h: number) {
   return Number.isInteger(h) ? String(h) : h.toFixed(1).replace(".", ",");
 }
 
+function formatDateBR(iso?: string): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y.slice(2)}`;
+}
+
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(":").map(Number);
   return (h || 0) * 60 + (m || 0);
@@ -144,6 +156,8 @@ function CellEditor({
 }) {
   const [inicio, setInicio] = useState<string>(initial?.inicio ?? "");
   const [fim, setFim] = useState<string>(initial?.fim ?? "");
+  const [dataInicio, setDataInicio] = useState<string>(initial?.dataInicio ?? "");
+  const [dataFim, setDataFim] = useState<string>(initial?.dataFim ?? "");
   const [horas, setHoras] = useState<string>(initial ? String(initial.horas) : "");
   const [horasTouched, setHorasTouched] = useState(false);
   const [frequencia, setFrequencia] = useState<Frequencia>(initial?.frequencia ?? "SEMANAL");
@@ -153,14 +167,19 @@ function CellEditor({
   const horasCalculadas = computeHoras(inicio, fim);
   const horasEfetivas = horasTouched || !horasCalculadas ? horas : String(horasCalculadas);
 
+  const vigenciaInvalida = !!dataInicio && !!dataFim && dataFim < dataInicio;
+
   const submit = () => {
     if (!inicio || !fim) return;
     if (timeToMinutes(fim) <= timeToMinutes(inicio)) return;
+    if (vigenciaInvalida) return;
     const h = Number((horasEfetivas || "0").replace(",", "."));
     if (!Number.isFinite(h) || h <= 0 || h > 24) return;
     onSave({
       horas: h, frequencia,
       inicio, fim,
+      dataInicio: dataInicio || undefined,
+      dataFim: dataFim || undefined,
       observacao: obs.trim() || undefined,
     });
   };
@@ -199,6 +218,33 @@ function CellEditor({
           {intervaloInvalido && (
             <p className="text-[11px] font-semibold text-gov-danger">O horário de fim deve ser maior que o de início.</p>
           )}
+
+          <div className="rounded-md border border-border bg-muted/30 p-2.5">
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Vigência da atividade <span className="font-normal normal-case">— pode ultrapassar o semestre da declaração</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-semibold mb-1">Data de início</label>
+                <input
+                  type="date" value={dataInicio}
+                  onChange={(e) => setDataInicio(e.target.value)}
+                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">Data de fim</label>
+                <input
+                  type="date" value={dataFim} min={dataInicio || undefined}
+                  onChange={(e) => setDataFim(e.target.value)}
+                  className={`w-full rounded-md border bg-card px-3 py-2 text-sm focus:border-gov-blue tabular-nums ${vigenciaInvalida ? "border-gov-danger" : "border-input"}`}
+                />
+              </div>
+            </div>
+            {vigenciaInvalida && (
+              <p className="mt-1.5 text-[11px] font-semibold text-gov-danger">A data de fim deve ser igual ou posterior à data de início.</p>
+            )}
+          </div>
           <div>
             <label className="block text-xs font-semibold mb-1">
               Carga horária (h) <span className="font-normal text-muted-foreground">— calculada automaticamente</span>
@@ -260,6 +306,11 @@ export function ResumoGrade({ grade }: { grade: Grade }) {
   const diasUnicos = new Set(Object.keys(grade).map((k) => k.split("-")[1])).size;
   const variaveis = entries.filter((c) => c.frequencia === "VARIAVEL").length;
 
+  const datasInicio = entries.map((c) => c.dataInicio).filter(Boolean) as string[];
+  const datasFim = entries.map((c) => c.dataFim).filter(Boolean) as string[];
+  const inicioMin = datasInicio.length ? datasInicio.sort()[0] : undefined;
+  const fimMax = datasFim.length ? datasFim.sort().slice(-1)[0] : undefined;
+
   return (
     <div className="rounded-md border border-border bg-card p-4">
       <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-gov-blue-dark">
@@ -269,6 +320,12 @@ export function ResumoGrade({ grade }: { grade: Grade }) {
         <Row label="Total de horas semanais" value={`${formatHoras(totalSemanal)}h`} highlight />
         <Row label="Dias da semana com atividades" value={`${diasUnicos} ${diasUnicos === 1 ? "dia" : "dias"}`} />
         <Row label="Atividades com frequência variável" value={`${variaveis} ${variaveis === 1 ? "registro" : "registros"}`} />
+        {(inicioMin || fimMax) && (
+          <Row
+            label="Vigência consolidada"
+            value={`${formatDateBR(inicioMin)} → ${formatDateBR(fimMax)}`}
+          />
+        )}
       </dl>
     </div>
   );
