@@ -31,7 +31,9 @@ import { Route as ChefiaRecursosRouteImport } from './routes/chefia.recursos'
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as AdminMfaRouteImport } from './routes/admin.mfa'
 import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
+import { Route as AdminGovbrRouteImport } from './routes/admin.govbr'
 import { Route as AdminAdRouteImport } from './routes/admin.ad'
 import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
@@ -147,9 +149,19 @@ const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMfaRoute = AdminMfaRouteImport.update({
+  id: '/mfa',
+  path: '/mfa',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMensageriaRoute = AdminMensageriaRouteImport.update({
   id: '/mensageria',
   path: '/mensageria',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGovbrRoute = AdminGovbrRouteImport.update({
+  id: '/govbr',
+  path: '/govbr',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdRoute = AdminAdRouteImport.update({
@@ -182,7 +194,9 @@ export interface FileRoutesByFullPath {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
+  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -207,7 +221,9 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
+  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -237,7 +253,9 @@ export interface FileRoutesById {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
+  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -268,7 +286,9 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/govbr'
     | '/admin/mensageria'
+    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -293,7 +313,9 @@ export interface FileRouteTypes {
     | '/faq'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/govbr'
     | '/admin/mensageria'
+    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -322,7 +344,9 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/govbr'
     | '/admin/mensageria'
+    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -511,11 +535,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsuariosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/mfa': {
+      id: '/admin/mfa'
+      path: '/mfa'
+      fullPath: '/admin/mfa'
+      preLoaderRoute: typeof AdminMfaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/mensageria': {
       id: '/admin/mensageria'
       path: '/mensageria'
       fullPath: '/admin/mensageria'
       preLoaderRoute: typeof AdminMensageriaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/govbr': {
+      id: '/admin/govbr'
+      path: '/govbr'
+      fullPath: '/admin/govbr'
+      preLoaderRoute: typeof AdminGovbrRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/ad': {
@@ -552,7 +590,9 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAcessosRoute: typeof AdminAcessosRoute
   AdminAdRoute: typeof AdminAdRoute
+  AdminGovbrRoute: typeof AdminGovbrRoute
   AdminMensageriaRoute: typeof AdminMensageriaRoute
+  AdminMfaRoute: typeof AdminMfaRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -560,7 +600,9 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAcessosRoute: AdminAcessosRoute,
   AdminAdRoute: AdminAdRoute,
+  AdminGovbrRoute: AdminGovbrRoute,
   AdminMensageriaRoute: AdminMensageriaRoute,
+  AdminMfaRoute: AdminMfaRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -636,13 +678,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
