@@ -22,6 +22,7 @@ function CoordLayout() {
     <div className="min-h-screen bg-background">
       <GovHeader
         perfilLabel="Coordenação CGAU/AGU"
+        rightAction={<GestaoSwitcher />}
         nav={[
           { to: "/coordenador", label: "Dashboard" },
           { to: "/coordenador/todas", label: "Todas as Solicitações" },
