@@ -21,6 +21,8 @@ import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
+import { Route as PerfilMfaRouteImport } from './routes/perfil.mfa'
+import { Route as MfaVerifyRouteImport } from './routes/mfa.verify'
 import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
 import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
 import { Route as CoordenadorFaqRouteImport } from './routes/coordenador.faq'
@@ -33,6 +35,7 @@ import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
 import { Route as AdminAdRouteImport } from './routes/admin.ad'
 import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
+import { Route as ApiAuthGovbrCallbackRouteImport } from './routes/api/auth.govbr.callback'
 
 const SolicitanteRoute = SolicitanteRouteImport.update({
   id: '/solicitante',
@@ -94,6 +97,16 @@ const SolicitanteMinhasRoute = SolicitanteMinhasRouteImport.update({
   path: '/minhas',
   getParentRoute: () => SolicitanteRoute,
 } as any)
+const PerfilMfaRoute = PerfilMfaRouteImport.update({
+  id: '/perfil/mfa',
+  path: '/perfil/mfa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MfaVerifyRoute = MfaVerifyRouteImport.update({
+  id: '/mfa/verify',
+  path: '/mfa/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoordenadorTodasRoute = CoordenadorTodasRouteImport.update({
   id: '/todas',
   path: '/todas',
@@ -154,6 +167,11 @@ const ChefiaAnaliseIdRoute = ChefiaAnaliseIdRouteImport.update({
   path: '/analise/$id',
   getParentRoute: () => ChefiaRoute,
 } as any)
+const ApiAuthGovbrCallbackRoute = ApiAuthGovbrCallbackRouteImport.update({
+  id: '/api/auth/govbr/callback',
+  path: '/api/auth/govbr/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +191,8 @@ export interface FileRoutesByFullPath {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -180,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
+  '/api/auth/govbr/callback': typeof ApiAuthGovbrCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,6 +216,8 @@ export interface FileRoutesByTo {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin': typeof AdminIndexRoute
@@ -202,6 +225,7 @@ export interface FileRoutesByTo {
   '/coordenador': typeof CoordenadorIndexRoute
   '/solicitante': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
+  '/api/auth/govbr/callback': typeof ApiAuthGovbrCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,6 +246,8 @@ export interface FileRoutesById {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -229,6 +255,7 @@ export interface FileRoutesById {
   '/coordenador/': typeof CoordenadorIndexRoute
   '/solicitante/': typeof SolicitanteIndexRoute
   '/chefia/analise/$id': typeof ChefiaAnaliseIdRoute
+  '/api/auth/govbr/callback': typeof ApiAuthGovbrCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -250,6 +277,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -257,6 +286,7 @@ export interface FileRouteTypes {
     | '/coordenador/'
     | '/solicitante/'
     | '/chefia/analise/$id'
+    | '/api/auth/govbr/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,6 +302,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin'
@@ -279,6 +311,7 @@ export interface FileRouteTypes {
     | '/coordenador'
     | '/solicitante'
     | '/chefia/analise/$id'
+    | '/api/auth/govbr/callback'
   id:
     | '__root__'
     | '/'
@@ -298,6 +331,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -305,6 +340,7 @@ export interface FileRouteTypes {
     | '/coordenador/'
     | '/solicitante/'
     | '/chefia/analise/$id'
+    | '/api/auth/govbr/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +350,9 @@ export interface RootRouteChildren {
   CoordenadorRoute: typeof CoordenadorRouteWithChildren
   FaqRoute: typeof FaqRoute
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
+  MfaVerifyRoute: typeof MfaVerifyRoute
+  PerfilMfaRoute: typeof PerfilMfaRoute
+  ApiAuthGovbrCallbackRoute: typeof ApiAuthGovbrCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -402,6 +441,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitanteMinhasRouteImport
       parentRoute: typeof SolicitanteRoute
     }
+    '/perfil/mfa': {
+      id: '/perfil/mfa'
+      path: '/perfil/mfa'
+      fullPath: '/perfil/mfa'
+      preLoaderRoute: typeof PerfilMfaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mfa/verify': {
+      id: '/mfa/verify'
+      path: '/mfa/verify'
+      fullPath: '/mfa/verify'
+      preLoaderRoute: typeof MfaVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/coordenador/todas': {
       id: '/coordenador/todas'
       path: '/todas'
@@ -486,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChefiaAnaliseIdRouteImport
       parentRoute: typeof ChefiaRoute
     }
+    '/api/auth/govbr/callback': {
+      id: '/api/auth/govbr/callback'
+      path: '/api/auth/govbr/callback'
+      fullPath: '/api/auth/govbr/callback'
+      preLoaderRoute: typeof ApiAuthGovbrCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -569,17 +629,10 @@ const rootRouteChildren: RootRouteChildren = {
   CoordenadorRoute: CoordenadorRouteWithChildren,
   FaqRoute: FaqRoute,
   SolicitanteRoute: SolicitanteRouteWithChildren,
+  MfaVerifyRoute: MfaVerifyRoute,
+  PerfilMfaRoute: PerfilMfaRoute,
+  ApiAuthGovbrCallbackRoute: ApiAuthGovbrCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

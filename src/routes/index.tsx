@@ -7,6 +7,8 @@ import type { Role } from "@/lib/types";
 import { CARGOS } from "@/lib/types";
 import { AguLogo } from "@/components/AguLogo";
 import { newRequestId, requestsStore } from "@/lib/admin-store";
+import { GOVBR_ENABLED } from "@/lib/feature-flags";
+import { getGovbrAuthorizeUrl } from "@/lib/govbr.functions";
 
 type Tab = "login" | "solicitar" | "recuperar";
 
@@ -21,13 +23,14 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, pendingMfa } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("login");
 
   useEffect(() => {
+    if (pendingMfa) { navigate({ to: "/mfa/verify" }); return; }
     if (user) navigate({ to: homeForRole(user.role) });
-  }, [user, navigate]);
+  }, [user, pendingMfa, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,7 +104,7 @@ function LoginPage() {
                 <TabBtn active={tab === "recuperar"} onClick={() => setTab("recuperar")} icon={<KeyRound className="h-4 w-4" />}>Esqueci a senha</TabBtn>
               </nav>
 
-              {tab === "login" && <LoginForm onLogin={(r) => { login(r); navigate({ to: homeForRole(r) }); }} />}
+              {tab === "login" && <LoginForm />}
               {tab === "solicitar" && <SolicitarForm onDone={() => setTab("login")} />}
               {tab === "recuperar" && <RecuperarForm />}
             </section>
@@ -130,17 +133,35 @@ function TabBtn({ active, onClick, icon, children }: { active: boolean; onClick:
   );
 }
 
-function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
+function LoginForm() {
+  const { loginLocal } = useAuth();
+  const navigate = useNavigate();
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [perfil, setPerfil] = useState<Role>("SOLICITANTE");
   const [erro, setErro] = useState("");
+  const [govbrLoading, setGovbrLoading] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!usuario.trim() || !senha.trim()) { setErro("Informe usuário e senha."); return; }
     setErro("");
-    onLogin(perfil);
+    const { requiresMfa } = loginLocal(perfil);
+    if (requiresMfa) navigate({ to: "/mfa/verify" });
+    else navigate({ to: homeForRole(perfil) });
+  };
+
+  const entrarComGovbr = async () => {
+    setGovbrLoading(true);
+    try {
+      const res = await getGovbrAuthorizeUrl();
+      if (!res.ok) { toast.error(res.error); return; }
+      window.location.href = res.url;
+    } catch {
+      toast.error("Falha ao iniciar login gov.br.");
+    } finally {
+      setGovbrLoading(false);
+    }
   };
 
   return (
@@ -179,12 +200,32 @@ function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
           </div>
         </fieldset>
 
-
         {erro && <p role="alert" className="rounded-md bg-[oklch(0.95_0.05_27)] px-3 py-2 text-sm text-gov-danger">{erro}</p>}
 
         <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gov-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-gov-blue-dark">
           <LogIn className="h-4 w-4" /> Entrar
         </button>
+
+        {GOVBR_ENABLED && (
+          <>
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+              <div className="relative flex justify-center text-[11px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">ou</span></div>
+            </div>
+            <button
+              type="button"
+              onClick={entrarComGovbr}
+              disabled={govbrLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gov-blue-dark px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            >
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-gov-yellow text-[10px] font-black text-gov-blue-dark">gov</span>
+              {govbrLoading ? "Redirecionando…" : "Entrar com gov.br"}
+            </button>
+            <p className="text-center text-[11px] text-muted-foreground">
+              MFA é validado nativamente pelo gov.br (nível de confiabilidade configurado).
+            </p>
+          </>
+        )}
       </form>
     </>
   );

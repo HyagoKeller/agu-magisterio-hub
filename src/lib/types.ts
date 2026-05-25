@@ -15,6 +15,10 @@ export interface User {
   ativo?: boolean;
   /** Grupos do AD que liberam acesso à Gestão do Portal (somente Chefia). */
   gruposGestao?: Array<"COORDENADOR" | "SUPERADMIN">;
+  /** MFA TOTP habilitado (login local/LDAP). Em prod, vem da coluna `mfa_enabled`. */
+  mfaEnabled?: boolean;
+  /** Segredo TOTP em base32. Em prod fica APENAS no banco (`mfa_secret`). */
+  mfaSecret?: string;
 }
 
 export type Frequencia = "SEMANAL" | "QUINZENAL" | "MENSAL" | "VARIAVEL";
