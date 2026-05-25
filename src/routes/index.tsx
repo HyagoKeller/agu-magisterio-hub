@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginPage() {
-  const { user, pendingMfa, login } = useAuth();
+  const { user, pendingMfa } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("login");
 
