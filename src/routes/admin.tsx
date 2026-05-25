@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { GovHeader } from "@/components/GovHeader";
+import { GestaoSwitcher } from "@/components/GestaoSwitcher";
 import { useAuth } from "@/lib/auth";
 import { useAccessRequests } from "@/lib/admin-store";
 
