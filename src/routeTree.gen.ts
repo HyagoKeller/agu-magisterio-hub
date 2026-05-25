@@ -21,6 +21,8 @@ import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
+import { Route as PerfilMfaRouteImport } from './routes/perfil.mfa'
+import { Route as MfaVerifyRouteImport } from './routes/mfa.verify'
 import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
 import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
 import { Route as CoordenadorFaqRouteImport } from './routes/coordenador.faq'
@@ -94,6 +96,16 @@ const SolicitanteMinhasRoute = SolicitanteMinhasRouteImport.update({
   id: '/minhas',
   path: '/minhas',
   getParentRoute: () => SolicitanteRoute,
+} as any)
+const PerfilMfaRoute = PerfilMfaRouteImport.update({
+  id: '/perfil/mfa',
+  path: '/perfil/mfa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MfaVerifyRoute = MfaVerifyRouteImport.update({
+  id: '/mfa/verify',
+  path: '/mfa/verify',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CoordenadorTodasRoute = CoordenadorTodasRouteImport.update({
   id: '/todas',
@@ -179,6 +191,8 @@ export interface FileRoutesByFullPath {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -202,6 +216,8 @@ export interface FileRoutesByTo {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin': typeof AdminIndexRoute
@@ -230,6 +246,8 @@ export interface FileRoutesById {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
+  '/mfa/verify': typeof MfaVerifyRoute
+  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -259,6 +277,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -282,6 +302,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin'
@@ -309,6 +331,8 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
+    | '/mfa/verify'
+    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -326,6 +350,8 @@ export interface RootRouteChildren {
   CoordenadorRoute: typeof CoordenadorRouteWithChildren
   FaqRoute: typeof FaqRoute
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
+  MfaVerifyRoute: typeof MfaVerifyRoute
+  PerfilMfaRoute: typeof PerfilMfaRoute
   ApiAuthGovbrCallbackRoute: typeof ApiAuthGovbrCallbackRoute
 }
 
@@ -414,6 +440,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/solicitante/minhas'
       preLoaderRoute: typeof SolicitanteMinhasRouteImport
       parentRoute: typeof SolicitanteRoute
+    }
+    '/perfil/mfa': {
+      id: '/perfil/mfa'
+      path: '/perfil/mfa'
+      fullPath: '/perfil/mfa'
+      preLoaderRoute: typeof PerfilMfaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mfa/verify': {
+      id: '/mfa/verify'
+      path: '/mfa/verify'
+      fullPath: '/mfa/verify'
+      preLoaderRoute: typeof MfaVerifyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/coordenador/todas': {
       id: '/coordenador/todas'
@@ -589,8 +629,20 @@ const rootRouteChildren: RootRouteChildren = {
   CoordenadorRoute: CoordenadorRouteWithChildren,
   FaqRoute: FaqRoute,
   SolicitanteRoute: SolicitanteRouteWithChildren,
+  MfaVerifyRoute: MfaVerifyRoute,
+  PerfilMfaRoute: PerfilMfaRoute,
   ApiAuthGovbrCallbackRoute: ApiAuthGovbrCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
