@@ -104,7 +104,7 @@ function LoginPage() {
                 <TabBtn active={tab === "recuperar"} onClick={() => setTab("recuperar")} icon={<KeyRound className="h-4 w-4" />}>Esqueci a senha</TabBtn>
               </nav>
 
-              {tab === "login" && <LoginForm onLogin={(r) => { login(r); navigate({ to: homeForRole(r) }); }} />}
+              {tab === "login" && <LoginForm />}
               {tab === "solicitar" && <SolicitarForm onDone={() => setTab("login")} />}
               {tab === "recuperar" && <RecuperarForm />}
             </section>
