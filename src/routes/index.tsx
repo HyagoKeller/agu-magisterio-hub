@@ -23,13 +23,14 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, pendingMfa, login } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("login");
 
   useEffect(() => {
+    if (pendingMfa) { navigate({ to: "/mfa/verify" }); return; }
     if (user) navigate({ to: homeForRole(user.role) });
-  }, [user, navigate]);
+  }, [user, pendingMfa, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
