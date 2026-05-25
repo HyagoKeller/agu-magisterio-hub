@@ -7,6 +7,8 @@ import type { Role } from "@/lib/types";
 import { CARGOS } from "@/lib/types";
 import { AguLogo } from "@/components/AguLogo";
 import { newRequestId, requestsStore } from "@/lib/admin-store";
+import { GOVBR_ENABLED } from "@/lib/feature-flags";
+import { getGovbrAuthorizeUrl } from "@/lib/govbr.functions";
 
 type Tab = "login" | "solicitar" | "recuperar";
 
