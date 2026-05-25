@@ -27,6 +27,7 @@ function AdminLayout() {
       <GovHeader
         perfilLabel="Superadministrador"
         unread={pend}
+        rightAction={<GestaoSwitcher />}
         nav={[
           { to: "/admin", label: "Visão Geral" },
           { to: "/admin/ad", label: "Integração AD" },
