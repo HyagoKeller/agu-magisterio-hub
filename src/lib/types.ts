@@ -13,6 +13,8 @@ export interface User {
   emailPessoal?: string;
   origem?: "AD" | "MANUAL";
   ativo?: boolean;
+  /** Grupos do AD que liberam acesso à Gestão do Portal (somente Chefia). */
+  gruposGestao?: Array<"COORDENADOR" | "SUPERADMIN">;
 }
 
 export type Frequencia = "SEMANAL" | "QUINZENAL" | "MENSAL" | "VARIAVEL";

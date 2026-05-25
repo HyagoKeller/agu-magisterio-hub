@@ -5,7 +5,7 @@ const KEY = "agu_magisterio_user_v1";
 
 const PRESET: Record<Role, User> = {
   SOLICITANTE: { id: "u1", nome: "João Pereira da Silva", email: "joao.silva@agu.gov.br", role: "SOLICITANTE", matricula: "1234567", emailPessoal: "joao.silva.pessoal@gmail.com", origem: "AD", ativo: true },
-  CHEFIA: { id: "ch1", nome: "Dra. Maria Helena Souza", email: "maria.souza@agu.gov.br", role: "CHEFIA", origem: "AD", ativo: true },
+  CHEFIA: { id: "ch1", nome: "Dra. Maria Helena Souza", email: "maria.souza@agu.gov.br", role: "CHEFIA", origem: "AD", ativo: true, gruposGestao: ["COORDENADOR", "SUPERADMIN"] },
   COORDENADOR: { id: "co1", nome: "Dr. Antônio Coordenador CGAU/AGU", email: "antonio.cgau@agu.gov.br", role: "COORDENADOR", origem: "AD", ativo: true },
   SUPERADMIN: { id: "sa1", nome: "Administrador do Sistema", email: "admin.ti@agu.gov.br", role: "SUPERADMIN", origem: "MANUAL", ativo: true },
 };
@@ -14,6 +14,8 @@ interface AuthCtx {
   user: User | null;
   login: (role: Role) => void;
   logout: () => void;
+  /** Alterna o perfil mantendo a identidade da Chefia (simula SSO multi-grupo do AD). */
+  switchRole: (role: Role) => void;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -39,7 +41,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  return <Ctx.Provider value={{ user, login, logout }}>{children}</Ctx.Provider>;
+  const switchRole = (role: Role) => {
+    if (!user) return;
+    // Mantém identidade do usuário logado (nome/email/matrícula/grupos) e troca o papel ativo.
+    const next: User = { ...user, role };
+    localStorage.setItem(KEY, JSON.stringify(next));
+    setUser(next);
+  };
+
+  return <Ctx.Provider value={{ user, login, logout, switchRole }}>{children}</Ctx.Provider>;
 }
 
 export function useAuth() {

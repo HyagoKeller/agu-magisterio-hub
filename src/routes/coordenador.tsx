@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { GovHeader } from "@/components/GovHeader";
+import { GestaoSwitcher } from "@/components/GestaoSwitcher";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/coordenador")({
@@ -21,6 +22,7 @@ function CoordLayout() {
     <div className="min-h-screen bg-background">
       <GovHeader
         perfilLabel="Coordenação CGAU/AGU"
+        rightAction={<GestaoSwitcher />}
         nav={[
           { to: "/coordenador", label: "Dashboard" },
           { to: "/coordenador/todas", label: "Todas as Solicitações" },

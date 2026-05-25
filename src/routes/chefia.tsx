@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { GovHeader } from "@/components/GovHeader";
+import { GestaoSwitcher } from "@/components/GestaoSwitcher";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
 
@@ -28,6 +29,7 @@ function ChefiaLayout() {
       <GovHeader
         perfilLabel="Chefia Imediata"
         unread={totalUnread}
+        rightAction={<GestaoSwitcher />}
         nav={[
           { to: "/chefia", label: "Início" },
           { to: "/chefia/pendentes", label: "Aprovações Pendentes", badge: pendentes || undefined },
