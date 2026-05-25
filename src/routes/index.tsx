@@ -161,63 +161,24 @@ function LoginForm({ onLogin }: { onLogin: (r: Role) => void }) {
         <fieldset>
           <legend className="block text-sm font-semibold mb-2">Perfil de acesso (demonstração — em produção vem do AD)</legend>
           <div className="grid gap-2">
-            <label className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ${perfil === "SOLICITANTE" ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
-              <input type="radio" name="perfil" value="SOLICITANTE" checked={perfil === "SOLICITANTE"} onChange={() => setPerfil("SOLICITANTE")} className="mt-0.5 accent-gov-blue" />
-              <span>
-                <span className="block font-semibold text-gov-blue-dark">Solicitante (Membro AGU)</span>
-                <span className="text-xs text-muted-foreground">Cria solicitações de magistério</span>
-              </span>
-            </label>
-
-            {/* Chefia Imediata — usuários com grupos de gestão no AD podem alternar para perfis de gestão */}
-            {(() => {
-              const isChefiaOuGestao = perfil === "CHEFIA" || perfil === "COORDENADOR" || perfil === "SUPERADMIN";
-              const isGestao = perfil === "COORDENADOR" || perfil === "SUPERADMIN";
-              return (
-                <label className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ${isChefiaOuGestao ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
-                  <input
-                    type="radio"
-                    name="perfil"
-                    checked={isChefiaOuGestao}
-                    onChange={() => setPerfil("CHEFIA")}
-                    className="mt-0.5 accent-gov-blue"
-                  />
-                  <span className="flex-1">
-                    <span className="block font-semibold text-gov-blue-dark">Chefia Imediata</span>
-                    <span className="text-xs text-muted-foreground">Aprova ou recusa solicitações. Usuários pertencentes aos grupos de gestão do AD podem acessar a Gestão do Portal.</span>
-
-                    {isChefiaOuGestao && (
-                      <div className="mt-2.5 rounded-md border border-dashed border-gov-blue/40 bg-card p-2.5">
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <span className="text-[11px] font-semibold uppercase tracking-wide text-gov-blue">Gestão do Portal</span>
-                          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Requer grupo AD</span>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
-                          Disponível apenas para membros dos grupos <code className="rounded bg-muted px-1">CN=GP_CGAU_Coordenacao</code> e <code className="rounded bg-muted px-1">CN=GP_TI_Superadmin</code>. Selecione abaixo para entrar como gestor; caso contrário, mantenha como Chefia Imediata.
-                        </p>
-                        <select
-                          value={isGestao ? perfil : ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            if (v === "") setPerfil("CHEFIA");
-                            else setPerfil(v as Role);
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label="Selecione o perfil de gestão (requer grupo AD)"
-                          className="w-full rounded-md border border-input bg-card px-2.5 py-1.5 text-sm text-foreground focus:border-gov-blue"
-                        >
-                          <option value="">— Entrar apenas como Chefia Imediata —</option>
-                          <option value="COORDENADOR">Coordenação CGAU/AGU — indicadores e validações</option>
-                          <option value="SUPERADMIN">Superadministrador (TI) — AD, usuários e grupos</option>
-                        </select>
-                      </div>
-                    )}
+            {(["SOLICITANTE", "CHEFIA"] as Role[]).map((r) => (
+              <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ${perfil === r ? "border-gov-blue bg-gov-blue-light" : "border-border hover:bg-accent"}`}>
+                <input type="radio" name="perfil" value={r} checked={perfil === r} onChange={() => setPerfil(r)} className="mt-0.5 accent-gov-blue" />
+                <span>
+                  <span className="block font-semibold text-gov-blue-dark">
+                    {r === "SOLICITANTE" ? "Solicitante (Membro AGU)" : "Chefia Imediata"}
                   </span>
-                </label>
-              );
-            })()}
+                  <span className="text-xs text-muted-foreground">
+                    {r === "SOLICITANTE"
+                      ? "Cria solicitações de magistério"
+                      : "Aprova ou recusa solicitações. Usuários com grupos de gestão no AD verão o atalho de Gestão do Portal no topo após o login."}
+                  </span>
+                </span>
+              </label>
+            ))}
           </div>
         </fieldset>
+
 
         {erro && <p role="alert" className="rounded-md bg-[oklch(0.95_0.05_27)] px-3 py-2 text-sm text-gov-danger">{erro}</p>}
 
