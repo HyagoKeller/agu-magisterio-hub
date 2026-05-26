@@ -34,6 +34,7 @@ import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminMfaRouteImport } from './routes/admin.mfa'
 import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
 import { Route as AdminGovbrRouteImport } from './routes/admin.govbr'
+import { Route as AdminEntraRouteImport } from './routes/admin.entra'
 import { Route as AdminAdRouteImport } from './routes/admin.ad'
 import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
@@ -164,6 +165,11 @@ const AdminGovbrRoute = AdminGovbrRouteImport.update({
   path: '/govbr',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEntraRoute = AdminEntraRouteImport.update({
+  id: '/entra',
+  path: '/entra',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdRoute = AdminAdRouteImport.update({
   id: '/ad',
   path: '/ad',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/solicitante': typeof SolicitanteRouteWithChildren
   '/admin/acessos': typeof AdminAcessosRoute
   '/admin/ad': typeof AdminAdRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
     | '/admin/mfa'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
     | '/admin/mfa'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/solicitante'
     | '/admin/acessos'
     | '/admin/ad'
+    | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
     | '/admin/mfa'
@@ -556,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGovbrRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/entra': {
+      id: '/admin/entra'
+      path: '/entra'
+      fullPath: '/admin/entra'
+      preLoaderRoute: typeof AdminEntraRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ad': {
       id: '/admin/ad'
       path: '/ad'
@@ -590,6 +609,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAcessosRoute: typeof AdminAcessosRoute
   AdminAdRoute: typeof AdminAdRoute
+  AdminEntraRoute: typeof AdminEntraRoute
   AdminGovbrRoute: typeof AdminGovbrRoute
   AdminMensageriaRoute: typeof AdminMensageriaRoute
   AdminMfaRoute: typeof AdminMfaRoute
@@ -600,6 +620,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAcessosRoute: AdminAcessosRoute,
   AdminAdRoute: AdminAdRoute,
+  AdminEntraRoute: AdminEntraRoute,
   AdminGovbrRoute: AdminGovbrRoute,
   AdminMensageriaRoute: AdminMensageriaRoute,
   AdminMfaRoute: AdminMfaRoute,
@@ -678,13 +699,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
