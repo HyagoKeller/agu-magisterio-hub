@@ -35,6 +35,7 @@ import { Route as AdminMfaRouteImport } from './routes/admin.mfa'
 import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
 import { Route as AdminGovbrRouteImport } from './routes/admin.govbr'
 import { Route as AdminEntraRouteImport } from './routes/admin.entra'
+import { Route as AdminEntraRouteImport } from './routes/admin.entra'
 import { Route as AdminAdRouteImport } from './routes/admin.ad'
 import { Route as AdminAcessosRouteImport } from './routes/admin.acessos'
 import { Route as ChefiaAnaliseIdRouteImport } from './routes/chefia.analise.$id'
@@ -170,6 +171,11 @@ const AdminEntraRoute = AdminEntraRouteImport.update({
   path: '/entra',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEntraRoute = AdminEntraRouteImport.update({
+  id: '/entra',
+  path: '/entra',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdRoute = AdminAdRouteImport.update({
   id: '/ad',
   path: '/ad',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/admin/ad': typeof AdminAdRoute
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/admin/ad': typeof AdminAdRoute
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/admin/ad': typeof AdminAdRoute
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
+  '/admin/entra': typeof AdminEntraRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
   '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
     | '/admin/ad'
     | '/admin/entra'
     | '/admin/govbr'
+    | '/admin/entra'
     | '/admin/mensageria'
     | '/admin/mfa'
     | '/admin/usuarios'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/admin/ad'
     | '/admin/entra'
     | '/admin/govbr'
+    | '/admin/entra'
     | '/admin/mensageria'
     | '/admin/mfa'
     | '/admin/usuarios'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '/admin/ad'
     | '/admin/entra'
     | '/admin/govbr'
+    | '/admin/entra'
     | '/admin/mensageria'
     | '/admin/mfa'
     | '/admin/usuarios'
@@ -575,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEntraRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/entra': {
+      id: '/admin/entra'
+      path: '/entra'
+      fullPath: '/admin/entra'
+      preLoaderRoute: typeof AdminEntraRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ad': {
       id: '/admin/ad'
       path: '/ad'
@@ -611,6 +630,7 @@ interface AdminRouteChildren {
   AdminAdRoute: typeof AdminAdRoute
   AdminEntraRoute: typeof AdminEntraRoute
   AdminGovbrRoute: typeof AdminGovbrRoute
+  AdminEntraRoute: typeof AdminEntraRoute
   AdminMensageriaRoute: typeof AdminMensageriaRoute
   AdminMfaRoute: typeof AdminMfaRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -622,6 +642,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdRoute: AdminAdRoute,
   AdminEntraRoute: AdminEntraRoute,
   AdminGovbrRoute: AdminGovbrRoute,
+  AdminEntraRoute: AdminEntraRoute,
   AdminMensageriaRoute: AdminMensageriaRoute,
   AdminMfaRoute: AdminMfaRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
