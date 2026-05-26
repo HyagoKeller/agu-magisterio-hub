@@ -16,7 +16,6 @@ type Cfg = {
   redirectUri: string;
   scopes: string;
   exigirMfaPolicy: boolean;
-  desabilitarMfaLocal: boolean;
 };
 
 const KEY = "agu_entra_config_v1";
@@ -27,7 +26,6 @@ const DEFAULT: Cfg = {
   redirectUri: "https://portal.agu.gov.br/api/auth/entra/callback",
   scopes: "openid profile email offline_access",
   exigirMfaPolicy: true,
-  desabilitarMfaLocal: true,
 };
 
 function EntraPage() {
