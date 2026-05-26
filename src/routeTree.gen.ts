@@ -21,8 +21,6 @@ import { Route as ChefiaIndexRouteImport } from './routes/chefia.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SolicitanteNovaRouteImport } from './routes/solicitante.nova'
 import { Route as SolicitanteMinhasRouteImport } from './routes/solicitante.minhas'
-import { Route as PerfilMfaRouteImport } from './routes/perfil.mfa'
-import { Route as MfaVerifyRouteImport } from './routes/mfa.verify'
 import { Route as CoordenadorTodasRouteImport } from './routes/coordenador.todas'
 import { Route as CoordenadorRelatoriosRouteImport } from './routes/coordenador.relatorios'
 import { Route as CoordenadorFaqRouteImport } from './routes/coordenador.faq'
@@ -31,7 +29,6 @@ import { Route as ChefiaRecursosRouteImport } from './routes/chefia.recursos'
 import { Route as ChefiaPendentesRouteImport } from './routes/chefia.pendentes'
 import { Route as ChefiaHistoricoRouteImport } from './routes/chefia.historico'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
-import { Route as AdminMfaRouteImport } from './routes/admin.mfa'
 import { Route as AdminMensageriaRouteImport } from './routes/admin.mensageria'
 import { Route as AdminGovbrRouteImport } from './routes/admin.govbr'
 import { Route as AdminEntraRouteImport } from './routes/admin.entra'
@@ -100,16 +97,6 @@ const SolicitanteMinhasRoute = SolicitanteMinhasRouteImport.update({
   path: '/minhas',
   getParentRoute: () => SolicitanteRoute,
 } as any)
-const PerfilMfaRoute = PerfilMfaRouteImport.update({
-  id: '/perfil/mfa',
-  path: '/perfil/mfa',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MfaVerifyRoute = MfaVerifyRouteImport.update({
-  id: '/mfa/verify',
-  path: '/mfa/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CoordenadorTodasRoute = CoordenadorTodasRouteImport.update({
   id: '/todas',
   path: '/todas',
@@ -148,11 +135,6 @@ const ChefiaHistoricoRoute = ChefiaHistoricoRouteImport.update({
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMfaRoute = AdminMfaRouteImport.update({
-  id: '/mfa',
-  path: '/mfa',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMensageriaRoute = AdminMensageriaRouteImport.update({
@@ -203,7 +185,6 @@ export interface FileRoutesByFullPath {
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
-  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -212,8 +193,6 @@ export interface FileRoutesByFullPath {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
-  '/mfa/verify': typeof MfaVerifyRoute
-  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -231,7 +210,6 @@ export interface FileRoutesByTo {
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
-  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -240,8 +218,6 @@ export interface FileRoutesByTo {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
-  '/mfa/verify': typeof MfaVerifyRoute
-  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin': typeof AdminIndexRoute
@@ -264,7 +240,6 @@ export interface FileRoutesById {
   '/admin/entra': typeof AdminEntraRoute
   '/admin/govbr': typeof AdminGovbrRoute
   '/admin/mensageria': typeof AdminMensageriaRoute
-  '/admin/mfa': typeof AdminMfaRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/chefia/historico': typeof ChefiaHistoricoRoute
   '/chefia/pendentes': typeof ChefiaPendentesRoute
@@ -273,8 +248,6 @@ export interface FileRoutesById {
   '/coordenador/faq': typeof CoordenadorFaqRoute
   '/coordenador/relatorios': typeof CoordenadorRelatoriosRoute
   '/coordenador/todas': typeof CoordenadorTodasRoute
-  '/mfa/verify': typeof MfaVerifyRoute
-  '/perfil/mfa': typeof PerfilMfaRoute
   '/solicitante/minhas': typeof SolicitanteMinhasRoute
   '/solicitante/nova': typeof SolicitanteNovaRoute
   '/admin/': typeof AdminIndexRoute
@@ -298,7 +271,6 @@ export interface FileRouteTypes {
     | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
-    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -307,8 +279,6 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
-    | '/mfa/verify'
-    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -326,7 +296,6 @@ export interface FileRouteTypes {
     | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
-    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -335,8 +304,6 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
-    | '/mfa/verify'
-    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin'
@@ -358,7 +325,6 @@ export interface FileRouteTypes {
     | '/admin/entra'
     | '/admin/govbr'
     | '/admin/mensageria'
-    | '/admin/mfa'
     | '/admin/usuarios'
     | '/chefia/historico'
     | '/chefia/pendentes'
@@ -367,8 +333,6 @@ export interface FileRouteTypes {
     | '/coordenador/faq'
     | '/coordenador/relatorios'
     | '/coordenador/todas'
-    | '/mfa/verify'
-    | '/perfil/mfa'
     | '/solicitante/minhas'
     | '/solicitante/nova'
     | '/admin/'
@@ -386,8 +350,6 @@ export interface RootRouteChildren {
   CoordenadorRoute: typeof CoordenadorRouteWithChildren
   FaqRoute: typeof FaqRoute
   SolicitanteRoute: typeof SolicitanteRouteWithChildren
-  MfaVerifyRoute: typeof MfaVerifyRoute
-  PerfilMfaRoute: typeof PerfilMfaRoute
   ApiAuthGovbrCallbackRoute: typeof ApiAuthGovbrCallbackRoute
 }
 
@@ -477,20 +439,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitanteMinhasRouteImport
       parentRoute: typeof SolicitanteRoute
     }
-    '/perfil/mfa': {
-      id: '/perfil/mfa'
-      path: '/perfil/mfa'
-      fullPath: '/perfil/mfa'
-      preLoaderRoute: typeof PerfilMfaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mfa/verify': {
-      id: '/mfa/verify'
-      path: '/mfa/verify'
-      fullPath: '/mfa/verify'
-      preLoaderRoute: typeof MfaVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/coordenador/todas': {
       id: '/coordenador/todas'
       path: '/todas'
@@ -545,13 +493,6 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/admin/usuarios'
       preLoaderRoute: typeof AdminUsuariosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/mfa': {
-      id: '/admin/mfa'
-      path: '/mfa'
-      fullPath: '/admin/mfa'
-      preLoaderRoute: typeof AdminMfaRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/mensageria': {
@@ -612,7 +553,6 @@ interface AdminRouteChildren {
   AdminEntraRoute: typeof AdminEntraRoute
   AdminGovbrRoute: typeof AdminGovbrRoute
   AdminMensageriaRoute: typeof AdminMensageriaRoute
-  AdminMfaRoute: typeof AdminMfaRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -623,7 +563,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEntraRoute: AdminEntraRoute,
   AdminGovbrRoute: AdminGovbrRoute,
   AdminMensageriaRoute: AdminMensageriaRoute,
-  AdminMfaRoute: AdminMfaRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -692,8 +631,6 @@ const rootRouteChildren: RootRouteChildren = {
   CoordenadorRoute: CoordenadorRouteWithChildren,
   FaqRoute: FaqRoute,
   SolicitanteRoute: SolicitanteRouteWithChildren,
-  MfaVerifyRoute: MfaVerifyRoute,
-  PerfilMfaRoute: PerfilMfaRoute,
   ApiAuthGovbrCallbackRoute: ApiAuthGovbrCallbackRoute,
 }
 export const routeTree = rootRouteImport

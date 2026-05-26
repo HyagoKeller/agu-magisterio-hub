@@ -16,7 +16,6 @@ type Cfg = {
   redirectUri: string;
   scopes: string;
   exigirMfaPolicy: boolean;
-  desabilitarMfaLocal: boolean;
 };
 
 const KEY = "agu_entra_config_v1";
@@ -27,7 +26,6 @@ const DEFAULT: Cfg = {
   redirectUri: "https://portal.agu.gov.br/api/auth/entra/callback",
   scopes: "openid profile email offline_access",
   exigirMfaPolicy: true,
-  desabilitarMfaLocal: true,
 };
 
 function EntraPage() {
@@ -116,13 +114,6 @@ function EntraPage() {
                 <span>
                   <strong>Exigir Conditional Access com MFA</strong> no tenant para esta aplicação.
                   <span className="block text-xs text-muted-foreground mt-0.5">Configure em Entra ID → Protection → Conditional Access. O portal apenas confia no claim <code className="text-xs">amr</code> do token retornado pelo Entra ID.</span>
-                </span>
-              </label>
-              <label className="flex items-start gap-2 text-sm">
-                <input type="checkbox" checked={form.desabilitarMfaLocal} onChange={(e) => set("desabilitarMfaLocal", e.target.checked)} className="mt-0.5 accent-gov-blue h-4 w-4" />
-                <span>
-                  <strong>Desabilitar MFA TOTP local</strong> para usuários que entrarem via Microsoft 365.
-                  <span className="block text-xs text-muted-foreground mt-0.5">Evita pedir 2 fatores em sequência. Quem usar login local (AD/LDAP) continua sujeito à política configurada em "MFA (2FA)".</span>
                 </span>
               </label>
             </div>
