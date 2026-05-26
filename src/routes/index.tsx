@@ -24,14 +24,13 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginPage() {
-  const { user, pendingMfa } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("login");
 
   useEffect(() => {
-    if (pendingMfa) { navigate({ to: "/mfa/verify" }); return; }
     if (user) navigate({ to: homeForRole(user.role) });
-  }, [user, pendingMfa, navigate]);
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,9 +147,8 @@ function LoginForm() {
     e.preventDefault();
     if (!usuario.trim() || !senha.trim()) { setErro("Informe usuário e senha."); return; }
     setErro("");
-    const { requiresMfa } = loginLocal(perfil);
-    if (requiresMfa) navigate({ to: "/mfa/verify" });
-    else navigate({ to: homeForRole(perfil) });
+    loginLocal(perfil);
+    navigate({ to: homeForRole(perfil) });
   };
 
   const entrarComGovbr = async () => {
