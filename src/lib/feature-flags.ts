@@ -4,3 +4,7 @@
  */
 export const GOVBR_ENABLED =
   String(import.meta.env.VITE_GOVBR_ENABLED ?? "").toLowerCase() === "true";
+
+/** Quando true, exibe o botão "Entrar com Microsoft 365 (Entra ID)" na tela de login. */
+export const ENTRA_ENABLED =
+  String(import.meta.env.VITE_ENTRA_ENABLED ?? "").toLowerCase() === "true";

@@ -7,8 +7,9 @@ import type { Role } from "@/lib/types";
 import { CARGOS } from "@/lib/types";
 import { AguLogo } from "@/components/AguLogo";
 import { newRequestId, requestsStore } from "@/lib/admin-store";
-import { GOVBR_ENABLED } from "@/lib/feature-flags";
+import { GOVBR_ENABLED, ENTRA_ENABLED } from "@/lib/feature-flags";
 import { getGovbrAuthorizeUrl } from "@/lib/govbr.functions";
+import { getEntraAuthorizeUrl } from "@/lib/entra.functions";
 
 type Tab = "login" | "solicitar" | "recuperar";
 
@@ -141,6 +142,7 @@ function LoginForm() {
   const [perfil, setPerfil] = useState<Role>("SOLICITANTE");
   const [erro, setErro] = useState("");
   const [govbrLoading, setGovbrLoading] = useState(false);
+  const [entraLoading, setEntraLoading] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +163,19 @@ function LoginForm() {
       toast.error("Falha ao iniciar login gov.br.");
     } finally {
       setGovbrLoading(false);
+    }
+  };
+
+  const entrarComEntra = async () => {
+    setEntraLoading(true);
+    try {
+      const res = await getEntraAuthorizeUrl();
+      if (!res.ok) { toast.error(res.error); return; }
+      window.location.href = res.url;
+    } catch {
+      toast.error("Falha ao iniciar login Microsoft 365.");
+    } finally {
+      setEntraLoading(false);
     }
   };
 
@@ -206,24 +221,46 @@ function LoginForm() {
           <LogIn className="h-4 w-4" /> Entrar
         </button>
 
-        {GOVBR_ENABLED && (
+        {(GOVBR_ENABLED || ENTRA_ENABLED) && (
           <>
             <div className="relative my-2">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
               <div className="relative flex justify-center text-[11px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">ou</span></div>
             </div>
-            <button
-              type="button"
-              onClick={entrarComGovbr}
-              disabled={govbrLoading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gov-blue-dark px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
-            >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-gov-yellow text-[10px] font-black text-gov-blue-dark">gov</span>
-              {govbrLoading ? "Redirecionando…" : "Entrar com gov.br"}
-            </button>
-            <p className="text-center text-[11px] text-muted-foreground">
-              MFA é validado nativamente pelo gov.br (nível de confiabilidade configurado).
-            </p>
+
+            {GOVBR_ENABLED && (
+              <>
+                <button
+                  type="button"
+                  onClick={entrarComGovbr}
+                  disabled={govbrLoading}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gov-blue-dark px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-gov-yellow text-[10px] font-black text-gov-blue-dark">gov</span>
+                  {govbrLoading ? "Redirecionando…" : "Entrar com gov.br"}
+                </button>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  MFA é validado nativamente pelo gov.br (nível de confiabilidade configurado).
+                </p>
+              </>
+            )}
+
+            {ENTRA_ENABLED && (
+              <>
+                <button
+                  type="button"
+                  onClick={entrarComEntra}
+                  disabled={entraLoading}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-accent disabled:opacity-60"
+                >
+                  <svg width="16" height="16" viewBox="0 0 21 21" aria-hidden="true"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+                  {entraLoading ? "Redirecionando…" : "Entrar com Microsoft 365"}
+                </button>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  MFA aplicado pelas Conditional Access Policies do Entra ID.
+                </p>
+              </>
+            )}
           </>
         )}
       </form>
