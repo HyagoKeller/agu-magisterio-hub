@@ -9,6 +9,8 @@ export const Route = createFileRoute("/admin/entra")({
   component: EntraPage,
 });
 
+type RoleKey = "SOLICITANTE" | "CHEFIA" | "COORDENADOR" | "SUPERADMIN";
+
 type Cfg = {
   tenantId: string;
   clientId: string;
@@ -16,6 +18,11 @@ type Cfg = {
   redirectUri: string;
   scopes: string;
   exigirMfaPolicy: boolean;
+  // Mapeamento de perfis (Entra → Portal)
+  claimSource: "groups" | "roles" | "wids";
+  defaultRole: RoleKey;
+  autoProvision: boolean;
+  groupMap: Record<RoleKey, string>;
 };
 
 const KEY = "agu_entra_config_v1";
@@ -26,6 +33,15 @@ const DEFAULT: Cfg = {
   redirectUri: "https://portal.agu.gov.br/api/auth/entra/callback",
   scopes: "openid profile email offline_access",
   exigirMfaPolicy: true,
+  claimSource: "groups",
+  defaultRole: "SOLICITANTE",
+  autoProvision: true,
+  groupMap: {
+    SOLICITANTE: "",
+    CHEFIA: "",
+    COORDENADOR: "",
+    SUPERADMIN: "",
+  },
 };
 
 function EntraPage() {
