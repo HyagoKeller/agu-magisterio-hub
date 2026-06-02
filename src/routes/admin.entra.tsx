@@ -9,6 +9,8 @@ export const Route = createFileRoute("/admin/entra")({
   component: EntraPage,
 });
 
+type RoleKey = "SOLICITANTE" | "CHEFIA" | "COORDENADOR" | "SUPERADMIN";
+
 type Cfg = {
   tenantId: string;
   clientId: string;
@@ -16,6 +18,11 @@ type Cfg = {
   redirectUri: string;
   scopes: string;
   exigirMfaPolicy: boolean;
+  // Mapeamento de perfis (Entra → Portal)
+  claimSource: "groups" | "roles" | "wids";
+  defaultRole: RoleKey;
+  autoProvision: boolean;
+  groupMap: Record<RoleKey, string>;
 };
 
 const KEY = "agu_entra_config_v1";
@@ -26,6 +33,15 @@ const DEFAULT: Cfg = {
   redirectUri: "https://portal.agu.gov.br/api/auth/entra/callback",
   scopes: "openid profile email offline_access",
   exigirMfaPolicy: true,
+  claimSource: "groups",
+  defaultRole: "SOLICITANTE",
+  autoProvision: true,
+  groupMap: {
+    SOLICITANTE: "",
+    CHEFIA: "",
+    COORDENADOR: "",
+    SUPERADMIN: "",
+  },
 };
 
 function EntraPage() {
@@ -120,6 +136,79 @@ function EntraPage() {
           </div>
 
           <div className="gov-card">
+            <h2 className="font-display text-lg mb-1">Mapeamento de perfis (Entra ID → Portal)</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Quando o usuário entra pelo 365, o portal lê os <strong>grupos/roles</strong> do token e atribui o perfil correspondente. A gestão de quem pertence a cada grupo é feita inteiramente no <strong>Entra ID</strong> (Identity → Groups ou App Roles), não neste portal.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Origem do claim">
+                <select value={form.claimSource} onChange={(e) => set("claimSource", e.target.value as Cfg["claimSource"])} className={inp}>
+                  <option value="groups">groups (Object IDs de Grupos de Segurança)</option>
+                  <option value="roles">roles (App Roles do App Registration)</option>
+                  <option value="wids">wids (Directory Roles bem conhecidos)</option>
+                </select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Recomendado: <strong>App Roles</strong> (claim <code>roles</code>) — mais legível e independente de IDs de grupo.
+                </p>
+              </Field>
+              <Field label="Perfil padrão (fallback)">
+                <select value={form.defaultRole} onChange={(e) => set("defaultRole", e.target.value as RoleKey)} className={inp}>
+                  <option value="SOLICITANTE">Solicitante</option>
+                  <option value="CHEFIA">Chefia Imediata</option>
+                  <option value="COORDENADOR">Coordenação CGAU</option>
+                  <option value="SUPERADMIN">Superadministrador</option>
+                </select>
+                <p className="text-xs text-muted-foreground mt-1">Aplicado quando o usuário não pertence a nenhum grupo mapeado.</p>
+              </Field>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              <div className="text-sm font-semibold">Vínculos por perfil</div>
+              {(Object.keys(form.groupMap) as RoleKey[]).map((role) => (
+                <div key={role} className="grid gap-2 md:grid-cols-[180px_1fr] md:items-center">
+                  <label className="text-sm">
+                    {role === "SOLICITANTE" && "Solicitante"}
+                    {role === "CHEFIA" && "Chefia Imediata"}
+                    {role === "COORDENADOR" && "Coordenação CGAU"}
+                    {role === "SUPERADMIN" && "Superadministrador"}
+                  </label>
+                  <input
+                    value={form.groupMap[role]}
+                    onChange={(e) => setForm({ ...form, groupMap: { ...form.groupMap, [role]: e.target.value } })}
+                    className={inp}
+                    placeholder={form.claimSource === "roles" ? "ex.: Portal.Coordenador" : "Object ID do grupo (GUID)"}
+                  />
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground">
+                Para múltiplos grupos no mesmo perfil, separe por vírgula. Se o usuário pertencer a vários, o portal usa a <strong>maior precedência</strong>: SUPERADMIN &gt; COORDENADOR &gt; CHEFIA &gt; SOLICITANTE.
+              </p>
+            </div>
+
+            <div className="mt-5 space-y-2 border-t border-border pt-4">
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" checked={form.autoProvision} onChange={(e) => set("autoProvision", e.target.checked)} className="mt-0.5 accent-gov-blue h-4 w-4" />
+                <span>
+                  <strong>Provisionamento automático (Just-in-Time)</strong>
+                  <span className="block text-xs text-muted-foreground mt-0.5">No 1º login, cria o usuário local com nome/e-mail/<code>oid</code> vindos do token e atribui o perfil conforme o mapeamento acima. Caso contrário, exige cadastro prévio em "Usuários e Grupos".</span>
+                </span>
+              </label>
+            </div>
+
+            <details className="mt-5 rounded-md border border-border bg-muted/40 p-3 text-xs">
+              <summary className="cursor-pointer font-semibold">Como configurar no Entra ID (passo a passo)</summary>
+              <ol className="list-decimal list-inside space-y-1 mt-2">
+                <li><strong>App Roles</strong> (recomendado): App registrations → seu app → <em>App roles</em> → crie 4 roles com <code>value</code>: <code>Portal.Solicitante</code>, <code>Portal.Chefia</code>, <code>Portal.Coordenador</code>, <code>Portal.Superadmin</code>.</li>
+                <li>Em <em>Enterprise applications</em> → seu app → <em>Users and groups</em>, atribua usuários/grupos a cada role.</li>
+                <li>Em <em>Token configuration</em>, adicione o claim opcional <code>groups</code> (se usar Grupos) ou habilite <code>roles</code> (já vem automático com App Roles).</li>
+                <li>Cole os <code>value</code> das roles (ou os Object IDs dos grupos) nos campos acima e salve.</li>
+                <li>O backend valida o <code>id_token</code>, lê o claim escolhido e atribui o perfil do portal — sem precisar de cadastro manual.</li>
+              </ol>
+            </details>
+          </div>
+
+          <div className="gov-card">
             <h2 className="font-display text-lg mb-4">Como aplicar no servidor</h2>
             <pre className="rounded-md bg-muted p-3 text-xs overflow-x-auto"><code>{`# .env
 VITE_ENTRA_ENABLED=true
@@ -127,11 +216,19 @@ ENTRA_TENANT_ID=${form.tenantId || "<tenant_id>"}
 ENTRA_CLIENT_ID=${form.clientId || "<client_id>"}
 ENTRA_CLIENT_SECRET=${form.clientSecret ? "******" : "<client_secret>"}
 ENTRA_REDIRECT_URI=${form.redirectUri}
-ENTRA_SCOPES=${form.scopes}`}</code></pre>
+ENTRA_SCOPES=${form.scopes}
+ENTRA_CLAIM_SOURCE=${form.claimSource}
+ENTRA_DEFAULT_ROLE=${form.defaultRole}
+ENTRA_AUTO_PROVISION=${form.autoProvision}
+ENTRA_ROLE_SOLICITANTE=${form.groupMap.SOLICITANTE || "<value|guid>"}
+ENTRA_ROLE_CHEFIA=${form.groupMap.CHEFIA || "<value|guid>"}
+ENTRA_ROLE_COORDENADOR=${form.groupMap.COORDENADOR || "<value|guid>"}
+ENTRA_ROLE_SUPERADMIN=${form.groupMap.SUPERADMIN || "<value|guid>"}`}</code></pre>
             <p className="text-xs text-muted-foreground mt-3">
               No App Registration do Entra ID: defina o redirect URI acima, habilite <strong>ID tokens</strong> em "Authentication" e crie um client secret em "Certificates &amp; secrets".
             </p>
           </div>
+
 
           <div className="flex justify-end">
             <button type="submit" className="inline-flex items-center justify-center rounded-full bg-gov-blue px-6 py-2.5 text-sm font-semibold text-white hover:bg-gov-blue-dark">
