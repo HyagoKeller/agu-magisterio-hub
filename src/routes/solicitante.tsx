@@ -43,7 +43,7 @@ function SolicitanteLayout() {
               aria-label="Nova Solicitação — registrar nova atividade de magistério ou corrigir dados de uma solicitação já aprovada"
               className="inline-flex items-center gap-2 rounded-full bg-gov-red px-4 py-2 text-sm font-semibold text-white hover:opacity-90 shadow-md ring-2 ring-gov-yellow/60 ring-offset-2 ring-offset-background animate-pulse-soft"
             >
-              <Plus className="h-4 w-4" /> Nova Solicitação
+              <Plus className="h-4 w-4" /> Declaração
             </Link>
             <div className="flex items-start gap-1.5 max-w-[260px]">
               <ArrowUp className="h-4 w-4 text-gov-red shrink-0 mt-0.5 animate-bounce-soft" aria-hidden />
