@@ -43,7 +43,7 @@ function DashboardSolicitante() {
     <>
       <GovBreadcrumb items={[{ label: "Início", to: "/solicitante" }]} />
       <section className="gov-container pb-10">
-        <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
           <div>
             <h1 className="font-display text-2xl">Olá, {user?.nome.split(" ")[0]}</h1>
             <p className="text-sm text-muted-foreground">
@@ -52,10 +52,18 @@ function DashboardSolicitante() {
           </div>
           <Link
             to="/solicitante/nova"
+            title="Use para registrar uma nova atividade de magistério no semestre ou para corrigir dados de uma solicitação já aprovada."
             className="sm:hidden inline-flex items-center gap-2 rounded-full bg-gov-red px-4 py-2 text-sm font-semibold text-white"
           >
             <Plus className="h-4 w-4" /> Nova Solicitação
           </Link>
+        </div>
+
+        <div className="mb-6 rounded-md border border-gov-blue/20 bg-gov-blue-light/50 px-4 py-3 text-sm text-gov-blue-dark">
+          <strong>Quando usar “Nova Solicitação”?</strong> Clique no botão vermelho{" "}
+          <span className="font-semibold">Nova Solicitação</span> para{" "}
+          <strong>registrar uma nova atividade de magistério no semestre</strong> ou para{" "}
+          <strong>corrigir dados de uma solicitação já aprovada</strong>.
         </div>
 
         {recursaveis.length > 0 && (
