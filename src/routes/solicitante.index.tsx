@@ -43,26 +43,24 @@ function DashboardSolicitante() {
     <>
       <GovBreadcrumb items={[{ label: "Início", to: "/solicitante" }]} />
       <section className="gov-container pb-10">
-        <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
           <div>
             <h1 className="font-display text-2xl">Olá, {user?.nome.split(" ")[0]}</h1>
             <p className="text-sm text-muted-foreground">
               Acompanhe suas solicitações de magistério.
             </p>
           </div>
-          <Link
-            to="/solicitante/nova"
-            title="Use para registrar uma nova atividade de magistério no semestre ou para corrigir dados de uma solicitação já aprovada."
-            className="sm:hidden inline-flex items-center gap-2 rounded-full bg-gov-red px-4 py-2 text-sm font-semibold text-white"
-          >
-            <Plus className="h-4 w-4" /> Nova Solicitação
-          </Link>
-        </div>
-
-        <div className="mb-6 flex sm:justify-end">
-          <div className="relative max-w-md rounded-md border border-gov-blue/20 bg-gov-blue-light/60 px-3 py-2 text-xs text-gov-blue-dark shadow-sm">
-            <span aria-hidden className="hidden sm:block absolute -top-1.5 right-8 h-3 w-3 rotate-45 border-l border-t border-gov-blue/20 bg-gov-blue-light/60" />
-            <strong>Use “Nova Solicitação”</strong> para registrar uma nova atividade de magistério no semestre <strong>ou</strong> corrigir dados de uma solicitação já aprovada.
+          <div className="sm:hidden flex flex-col items-end gap-1">
+            <Link
+              to="/solicitante/nova"
+              title="Use para registrar uma nova atividade de magistério no semestre ou para corrigir dados de uma solicitação já aprovada."
+              className="inline-flex items-center gap-2 rounded-full bg-gov-red px-4 py-2 text-sm font-semibold text-white shadow-sm"
+            >
+              <Plus className="h-4 w-4" /> Nova Solicitação
+            </Link>
+            <span className="text-[11px] leading-tight text-muted-foreground max-w-[220px] text-right">
+              Nova atividade no semestre <strong className="text-gov-blue-dark">ou</strong> corrigir solicitação já aprovada
+            </span>
           </div>
         </div>
 
