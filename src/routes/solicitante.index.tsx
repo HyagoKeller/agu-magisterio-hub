@@ -59,11 +59,11 @@ function DashboardSolicitante() {
           </Link>
         </div>
 
-        <div className="mb-6 rounded-md border border-gov-blue/20 bg-gov-blue-light/50 px-4 py-3 text-sm text-gov-blue-dark">
-          <strong>Quando usar “Nova Solicitação”?</strong> Clique no botão vermelho{" "}
-          <span className="font-semibold">Nova Solicitação</span> para{" "}
-          <strong>registrar uma nova atividade de magistério no semestre</strong> ou para{" "}
-          <strong>corrigir dados de uma solicitação já aprovada</strong>.
+        <div className="mb-6 flex sm:justify-end">
+          <div className="relative max-w-md rounded-md border border-gov-blue/20 bg-gov-blue-light/60 px-3 py-2 text-xs text-gov-blue-dark shadow-sm">
+            <span aria-hidden className="hidden sm:block absolute -top-1.5 right-8 h-3 w-3 rotate-45 border-l border-t border-gov-blue/20 bg-gov-blue-light/60" />
+            <strong>Use “Nova Solicitação”</strong> para registrar uma nova atividade de magistério no semestre <strong>ou</strong> corrigir dados de uma solicitação já aprovada.
+          </div>
         </div>
 
         {recursaveis.length > 0 && (
