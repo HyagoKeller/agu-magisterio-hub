@@ -167,3 +167,17 @@
     padding: 1.5rem;
   }
 }
+
+@layer utilities {
+  @keyframes bounce-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  .animate-bounce-soft { animation: bounce-soft 1.4s ease-in-out infinite; }
+
+  @keyframes pulse-soft {
+    0%, 100% { box-shadow: 0 0 0 0 oklch(0.85 0.18 90 / 0.55); }
+    50% { box-shadow: 0 0 0 8px oklch(0.85 0.18 90 / 0); }
+  }
+  .animate-pulse-soft { animation: pulse-soft 2s ease-out infinite; }
+}
