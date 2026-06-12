@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUp } from "lucide-react";
 import { GovHeader } from "@/components/GovHeader";
 import { useAuth } from "@/lib/auth";
 import { useSolicitacoes } from "@/lib/store";
