@@ -398,11 +398,12 @@ Em caso de falha no envio, a Coordenadoria de Sistemas deve verificar:
 | **AU / PFN / PF / PBCB / QS** | Carreiras: Advogado da União, Procurador da Fazenda Nacional, Procurador Federal, Procurador do BACEN, Quadro Suplementar |
 | **SIAPE** | Sistema Integrado de Administração de Recursos Humanos |
 | **OAB** | Ordem dos Advogados do Brasil |
-| **MFA** | Multi-Factor Authentication |
-| **JIT** | Just-In-Time provisioning |
-| **Entra ID** | Microsoft Entra ID (antigo Azure AD) |
-| **AD** | Active Directory institucional |
-| **SSO** | Single Sign-On |
+| **MFA** | Multi-Factor Authentication (TOTP local — RFC 6238) |
+| **TOTP** | Time-based One-Time Password |
+| **JIT** | Just-In-Time provisioning (criação automática do perfil no 1º login) |
+| **LDAP / LDAPS** | Lightweight Directory Access Protocol (sobre TLS) |
+| **AD** | Active Directory institucional da AGU |
+| **SMTP** | Simple Mail Transfer Protocol (envio de e-mails) |
 | **SLA** | Service Level Agreement (tempo médio de análise) |
 
 ---
