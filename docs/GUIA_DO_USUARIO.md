@@ -358,16 +358,17 @@ Toda decisão gera log com: usuário autor, data/hora, IP, estado anterior x nov
 
 Caminho: `/admin`.
 
-- **Admin → Microsoft 365** — configura Tenant ID, Client ID, política de Conditional Access e **mapeamento de App Roles / Grupos do Entra ID** para os perfis do portal (Solicitante, Chefia, CGAU, Superadmin), com provisionamento JIT.
-- **Admin → gov.br** — habilita login via gov.br quando aplicável (feature flag `VITE_GOVBR_ENABLED`).
-- **Admin → Usuários** — visualiza usuários provisionados, força resync com o AD.
-- **Admin → Logs** — auditoria global.
+- **Admin → Active Directory (LDAP)** — endpoint LDAP/LDAPS, Base DN, conta de serviço, filtros de busca e **mapeamento de Grupos do AD** para os perfis do portal (Solicitante, Chefia, CGAU, Superadmin), com provisionamento JIT no primeiro login.
+- **Admin → MFA** — política de MFA local (TOTP): emissor (issuer), janela de tolerância, quantidade de códigos de recuperação, reset de segredo por usuário.
+- **Admin → SMTP** — servidor de saída, porta, TLS, remetente institucional e templates de e-mail.
+- **Admin → Usuários** — visualiza usuários provisionados, força resync com o AD, reseta MFA.
+- **Admin → Logs** — auditoria global (login, MFA, decisões, alterações de configuração).
 
 ---
 
-## 8. Notificações por e-mail (Microsoft Graph)
+## 8. Notificações por e-mail (SMTP institucional)
 
-O portal usa **Microsoft Graph API** (`/users/{remetente}/sendMail`) com o app registrado no tenant AGU. Todos os e-mails partem da caixa institucional configurada em **Admin → Microsoft 365 → Remetente**.
+O portal envia e-mails via **SMTP institucional** da AGU. O servidor, porta, autenticação, TLS e o endereço remetente são configurados em **Admin → SMTP**.
 
 Eventos que disparam e-mail:
 
@@ -380,10 +381,11 @@ Eventos que disparam e-mail:
 | Decisão da CGAU | Solicitante + Chefia |
 | Correção criada | Chefia |
 
-Em caso de **erro 403 ErrorAccessDenied**, a Coordenação de Sistemas deve verificar:
-- *Application Access Policy* limitando o app à caixa remetente;
-- Licença Exchange Online ativa para o remetente;
-- Permissão `Mail.Send` consentida em nível de aplicação.
+Em caso de falha no envio, a Coordenadoria de Sistemas deve verificar:
+- conectividade do portal com o servidor SMTP (host/porta liberados em firewall);
+- autenticação da conta remetente (usuário/senha ou token);
+- política TLS exigida pelo servidor;
+- logs em **Admin → Logs → SMTP** com o motivo da rejeição.
 
 ---
 
