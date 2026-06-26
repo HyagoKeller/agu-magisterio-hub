@@ -424,10 +424,12 @@ Acesse `/faq` no portal para a base completa e atualizada pela CGAU. Temas mais 
 
 | Sintoma | Causa provável | O que fazer |
 |---|---|---|
-| Não consigo entrar com M365 | Conta sem licença / MFA não configurado | Service Desk → `https://aka.ms/mfasetup` |
+| "Usuário ou senha inválidos" | Credencial do AD incorreta ou bloqueada | Resetar senha da Rede AGU pelos canais oficiais |
+| Código MFA recusado | Relógio do celular fora de sincronia | Ajustar data/hora automática no aparelho e tentar novamente |
+| Perdi o aplicativo autenticador | Sem acesso ao TOTP | Usar código de recuperação OU abrir chamado no Service Desk para reset do MFA |
 | Botão "Enviar" desabilitado | Declarações obrigatórias não marcadas ou campo inválido | Reveja os 4 checkboxes e os campos em vermelho |
 | Editor da grade não salva | Vigência fora do semestre | Ajuste datas dentro de 01/01–30/06 ou 01/07–31/12 |
-| Chefia não recebeu e-mail | E-mail digitado errado ou erro 403 no Graph | Abrir chamado; CGAU pode reencaminhar |
+| Chefia não recebeu e-mail | E-mail digitado errado ou falha SMTP | Abrir chamado; CGAU pode reencaminhar |
 | Recurso desabilitado | Prazo de 5 dias úteis expirado | Não há nova instância administrativa |
 | "Acesso negado" ao perfil de Coordenação | Grupo AD ausente | Solicitar inclusão em `PORTAL-MAG-CGAU` |
 | Sessão expira muito rápido | Política de inatividade (30 min) | Comportamento esperado — refaça login |
