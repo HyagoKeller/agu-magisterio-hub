@@ -242,7 +242,7 @@ Em **Minhas Solicitações** cada item exibe um *StatusTag*:
 | **EM RECURSO** | Recurso protocolado | Acompanhar |
 | **CANCELADA** | Cancelada pelo solicitante | — |
 
-E-mails são enviados (via Microsoft Graph) em todo evento: envio, decisão, recurso, alteração de status.
+E-mails são enviados via SMTP institucional em todo evento: envio, decisão, recurso, alteração de status.
 
 ### 4.6 Recurso (em caso de recusa da Chefia)
 
