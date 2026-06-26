@@ -191,7 +191,7 @@ Ver detalhamento completo em [4.4 Grade de horários](#44-grade-de-horários).
 O sistema mostra um **resumo final** com toda a declaração. Confira e clique em **Enviar**.
 Após o envio:
 - A solicitação recebe um **protocolo** (ex.: `MAG-2026-000123`);
-- A Chefia Imediata recebe e-mail automático via Microsoft Graph;
+- A Chefia Imediata recebe e-mail automático via SMTP institucional;
 - O status inicial é **PENDENTE**.
 
 ### 4.3 Correção de declaração já aprovada
