@@ -22,7 +22,7 @@
 5. [Módulo Chefia Imediata](#5-módulo-chefia-imediata)
 6. [Módulo Coordenação CGAU](#6-módulo-coordenação-cgau)
 7. [Módulo Superadmin / TI](#7-módulo-superadmin--ti)
-8. [Notificações por e-mail (Microsoft Graph)](#8-notificações-por-e-mail-microsoft-graph)
+8. [Notificações por e-mail (SMTP institucional)](#8-notificações-por-e-mail-smtp-institucional)
 9. [Glossário e siglas](#9-glossário-e-siglas)
 10. [Perguntas frequentes (FAQ resumida)](#10-perguntas-frequentes)
 11. [Resolução de problemas (troubleshooting)](#11-resolução-de-problemas)
