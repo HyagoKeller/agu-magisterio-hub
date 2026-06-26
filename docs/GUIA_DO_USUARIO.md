@@ -38,7 +38,7 @@ O **Portal Magistério AGU** automatiza o ciclo completo da autorização para e
 - Encaminhamento automático para a **Chefia Imediata** indicada pelo próprio membro;
 - Fluxo de **Recurso** (5 dias úteis) em caso de recusa;
 - Painel da **Coordenação CGAU** com métricas, filtros, exportações e auditoria;
-- Integração com **Microsoft 365 (Entra ID)** para autenticação, MFA e disparo de e-mails via Microsoft Graph;
+- Autenticação via **Active Directory (LDAP)** institucional da Rede AGU, com **MFA local (TOTP)** gerido pelo próprio portal;
 - Aderência total ao **Design System gov.br** (acessibilidade WCAG AA, contraste, semântica, navegação por teclado).
 
 ### Ambientes
