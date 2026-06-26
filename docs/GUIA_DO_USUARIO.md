@@ -52,29 +52,45 @@ O **Portal Magistério AGU** automatiza o ciclo completo da autorização para e
 
 ## 2. Acesso, login e MFA
 
-### 2.1 Formas de login
+### 2.1 Forma de login
 
-| Opção | Quando usar | Observações |
-|---|---|---|
-| **Microsoft 365 (recomendado)** | Padrão institucional para todos os membros | MFA aplicado pelo tenant AGU (Conditional Access) |
-| **gov.br** | Apenas quando habilitado pela Coordenação | Login Único do governo federal — nível Prata ou Ouro |
-| **Usuário AGU + Senha (LDAP/AD)** | Contas sem SSO habilitado | Senha gerida pelo AD institucional |
+O Portal Magistério usa **exclusivamente** as credenciais da **Rede AGU** (Active Directory institucional), com **MFA local (TOTP)** gerido pelo próprio portal.
 
-### 2.2 MFA (Multi-Factor Authentication)
+| Campo | Regra |
+|---|---|
+| **Usuário Rede AGU** | Login do AD (ex.: `joao.silva`) — sem `@agu.gov.br` |
+| **Senha** | Mesma senha da Rede AGU (validada via LDAP/LDAPS) |
+| **Perfil de acesso** | Solicitante (Membro Titular de Cargo) ou Chefia Imediata |
 
-O segundo fator é **delegado ao Microsoft Entra ID**. O portal não armazena segredos TOTP.
+> Não há login por Microsoft 365, Entra ID ou gov.br nesta versão. Toda autenticação passa pelo AD.
 
-- Para registrar o Microsoft Authenticator: `https://aka.ms/mfasetup`
-- Caso o dispositivo seja trocado, procure o Service Desk da AGU para resetar o método.
-- Conditional Access pode exigir reautenticação periódica, dispositivo gerenciado (Intune) ou rede confiável.
+### 2.2 MFA local (Multi-Factor Authentication)
+
+O segundo fator é **TOTP (RFC 6238)** gerido pelo próprio portal, compatível com qualquer aplicativo autenticador (Microsoft Authenticator, Google Authenticator, Authy, FreeOTP, 1Password etc.).
+
+**Cadastro inicial (obrigatório no primeiro login):**
+
+1. Após informar usuário e senha do AD, o portal mostra um **QR Code** e uma **chave secreta** (Base32).
+2. Abra seu aplicativo autenticador e escaneie o QR Code (ou digite a chave manualmente).
+3. Digite o código de 6 dígitos exibido pelo aplicativo para concluir o cadastro.
+4. Guarde os **códigos de recuperação** (one-time) em local seguro.
+
+**Logins seguintes:**
+
+1. Usuário Rede AGU + senha + perfil → **Entrar**.
+2. Tela `/mfa/verify` → digite o código TOTP de 6 dígitos.
+3. Acesso liberado.
+
+**Reset de MFA:** se o dispositivo for trocado/perdido, use um código de recuperação ou abra chamado no **Service Desk AGU** → a Coordenadoria de Sistemas zera o segredo TOTP e o cadastro reinicia no próximo login.
 
 ### 2.3 Primeiro acesso
 
 1. Acesse a URL do portal.
-2. Clique em **"Entrar com Microsoft 365"**.
-3. Informe o e-mail institucional `@agu.gov.br`.
-4. Confirme o MFA no aplicativo Authenticator.
-5. No primeiro login o portal cria seu perfil **automaticamente** (provisionamento JIT) com base nos *App Roles* e *Grupos* do Entra ID.
+2. Informe **Usuário Rede AGU** e **Senha**.
+3. Selecione o **Perfil de acesso** (Solicitante ou Chefia).
+4. Clique em **"Entrar com Usuário Rede AGU"**.
+5. Cadastre o **MFA local** seguindo o passo a passo acima.
+6. O portal cria seu perfil automaticamente com base nos grupos do AD.
 
 ### 2.4 Encerramento de sessão
 
