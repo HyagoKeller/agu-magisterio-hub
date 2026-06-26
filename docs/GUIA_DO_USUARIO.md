@@ -22,7 +22,7 @@
 5. [Módulo Chefia Imediata](#5-módulo-chefia-imediata)
 6. [Módulo Coordenação CGAU](#6-módulo-coordenação-cgau)
 7. [Módulo Superadmin / TI](#7-módulo-superadmin--ti)
-8. [Notificações por e-mail (Microsoft Graph)](#8-notificações-por-e-mail-microsoft-graph)
+8. [Notificações por e-mail (SMTP institucional)](#8-notificações-por-e-mail-smtp-institucional)
 9. [Glossário e siglas](#9-glossário-e-siglas)
 10. [Perguntas frequentes (FAQ resumida)](#10-perguntas-frequentes)
 11. [Resolução de problemas (troubleshooting)](#11-resolução-de-problemas)
@@ -38,7 +38,7 @@ O **Portal Magistério AGU** automatiza o ciclo completo da autorização para e
 - Encaminhamento automático para a **Chefia Imediata** indicada pelo próprio membro;
 - Fluxo de **Recurso** (5 dias úteis) em caso de recusa;
 - Painel da **Coordenação CGAU** com métricas, filtros, exportações e auditoria;
-- Integração com **Microsoft 365 (Entra ID)** para autenticação, MFA e disparo de e-mails via Microsoft Graph;
+- Autenticação via **Active Directory (LDAP)** institucional da Rede AGU, com **MFA local (TOTP)** gerido pelo próprio portal;
 - Aderência total ao **Design System gov.br** (acessibilidade WCAG AA, contraste, semântica, navegação por teclado).
 
 ### Ambientes
@@ -52,29 +52,45 @@ O **Portal Magistério AGU** automatiza o ciclo completo da autorização para e
 
 ## 2. Acesso, login e MFA
 
-### 2.1 Formas de login
+### 2.1 Forma de login
 
-| Opção | Quando usar | Observações |
-|---|---|---|
-| **Microsoft 365 (recomendado)** | Padrão institucional para todos os membros | MFA aplicado pelo tenant AGU (Conditional Access) |
-| **gov.br** | Apenas quando habilitado pela Coordenação | Login Único do governo federal — nível Prata ou Ouro |
-| **Usuário AGU + Senha (LDAP/AD)** | Contas sem SSO habilitado | Senha gerida pelo AD institucional |
+O Portal Magistério usa **exclusivamente** as credenciais da **Rede AGU** (Active Directory institucional), com **MFA local (TOTP)** gerido pelo próprio portal.
 
-### 2.2 MFA (Multi-Factor Authentication)
+| Campo | Regra |
+|---|---|
+| **Usuário Rede AGU** | Login do AD (ex.: `joao.silva`) — sem `@agu.gov.br` |
+| **Senha** | Mesma senha da Rede AGU (validada via LDAP/LDAPS) |
+| **Perfil de acesso** | Solicitante (Membro Titular de Cargo) ou Chefia Imediata |
 
-O segundo fator é **delegado ao Microsoft Entra ID**. O portal não armazena segredos TOTP.
+> Não há login por Microsoft 365, Entra ID ou gov.br nesta versão. Toda autenticação passa pelo AD.
 
-- Para registrar o Microsoft Authenticator: `https://aka.ms/mfasetup`
-- Caso o dispositivo seja trocado, procure o Service Desk da AGU para resetar o método.
-- Conditional Access pode exigir reautenticação periódica, dispositivo gerenciado (Intune) ou rede confiável.
+### 2.2 MFA local (Multi-Factor Authentication)
+
+O segundo fator é **TOTP (RFC 6238)** gerido pelo próprio portal, compatível com qualquer aplicativo autenticador (Microsoft Authenticator, Google Authenticator, Authy, FreeOTP, 1Password etc.).
+
+**Cadastro inicial (obrigatório no primeiro login):**
+
+1. Após informar usuário e senha do AD, o portal mostra um **QR Code** e uma **chave secreta** (Base32).
+2. Abra seu aplicativo autenticador e escaneie o QR Code (ou digite a chave manualmente).
+3. Digite o código de 6 dígitos exibido pelo aplicativo para concluir o cadastro.
+4. Guarde os **códigos de recuperação** (one-time) em local seguro.
+
+**Logins seguintes:**
+
+1. Usuário Rede AGU + senha + perfil → **Entrar**.
+2. Tela `/mfa/verify` → digite o código TOTP de 6 dígitos.
+3. Acesso liberado.
+
+**Reset de MFA:** se o dispositivo for trocado/perdido, use um código de recuperação ou abra chamado no **Service Desk AGU** → a Coordenadoria de Sistemas zera o segredo TOTP e o cadastro reinicia no próximo login.
 
 ### 2.3 Primeiro acesso
 
 1. Acesse a URL do portal.
-2. Clique em **"Entrar com Microsoft 365"**.
-3. Informe o e-mail institucional `@agu.gov.br`.
-4. Confirme o MFA no aplicativo Authenticator.
-5. No primeiro login o portal cria seu perfil **automaticamente** (provisionamento JIT) com base nos *App Roles* e *Grupos* do Entra ID.
+2. Informe **Usuário Rede AGU** e **Senha**.
+3. Selecione o **Perfil de acesso** (Solicitante ou Chefia).
+4. Clique em **"Entrar com Usuário Rede AGU"**.
+5. Cadastre o **MFA local** seguindo o passo a passo acima.
+6. O portal cria seu perfil automaticamente com base nos grupos do AD.
 
 ### 2.4 Encerramento de sessão
 
@@ -175,7 +191,7 @@ Ver detalhamento completo em [4.4 Grade de horários](#44-grade-de-horários).
 O sistema mostra um **resumo final** com toda a declaração. Confira e clique em **Enviar**.
 Após o envio:
 - A solicitação recebe um **protocolo** (ex.: `MAG-2026-000123`);
-- A Chefia Imediata recebe e-mail automático via Microsoft Graph;
+- A Chefia Imediata recebe e-mail automático via SMTP institucional;
 - O status inicial é **PENDENTE**.
 
 ### 4.3 Correção de declaração já aprovada
@@ -226,7 +242,7 @@ Em **Minhas Solicitações** cada item exibe um *StatusTag*:
 | **EM RECURSO** | Recurso protocolado | Acompanhar |
 | **CANCELADA** | Cancelada pelo solicitante | — |
 
-E-mails são enviados (via Microsoft Graph) em todo evento: envio, decisão, recurso, alteração de status.
+E-mails são enviados via SMTP institucional em todo evento: envio, decisão, recurso, alteração de status.
 
 ### 4.6 Recurso (em caso de recusa da Chefia)
 
@@ -342,16 +358,17 @@ Toda decisão gera log com: usuário autor, data/hora, IP, estado anterior x nov
 
 Caminho: `/admin`.
 
-- **Admin → Microsoft 365** — configura Tenant ID, Client ID, política de Conditional Access e **mapeamento de App Roles / Grupos do Entra ID** para os perfis do portal (Solicitante, Chefia, CGAU, Superadmin), com provisionamento JIT.
-- **Admin → gov.br** — habilita login via gov.br quando aplicável (feature flag `VITE_GOVBR_ENABLED`).
-- **Admin → Usuários** — visualiza usuários provisionados, força resync com o AD.
-- **Admin → Logs** — auditoria global.
+- **Admin → Active Directory (LDAP)** — endpoint LDAP/LDAPS, Base DN, conta de serviço, filtros de busca e **mapeamento de Grupos do AD** para os perfis do portal (Solicitante, Chefia, CGAU, Superadmin), com provisionamento JIT no primeiro login.
+- **Admin → MFA** — política de MFA local (TOTP): emissor (issuer), janela de tolerância, quantidade de códigos de recuperação, reset de segredo por usuário.
+- **Admin → SMTP** — servidor de saída, porta, TLS, remetente institucional e templates de e-mail.
+- **Admin → Usuários** — visualiza usuários provisionados, força resync com o AD, reseta MFA.
+- **Admin → Logs** — auditoria global (login, MFA, decisões, alterações de configuração).
 
 ---
 
-## 8. Notificações por e-mail (Microsoft Graph)
+## 8. Notificações por e-mail (SMTP institucional)
 
-O portal usa **Microsoft Graph API** (`/users/{remetente}/sendMail`) com o app registrado no tenant AGU. Todos os e-mails partem da caixa institucional configurada em **Admin → Microsoft 365 → Remetente**.
+O portal envia e-mails via **SMTP institucional** da AGU. O servidor, porta, autenticação, TLS e o endereço remetente são configurados em **Admin → SMTP**.
 
 Eventos que disparam e-mail:
 
@@ -364,10 +381,11 @@ Eventos que disparam e-mail:
 | Decisão da CGAU | Solicitante + Chefia |
 | Correção criada | Chefia |
 
-Em caso de **erro 403 ErrorAccessDenied**, a Coordenação de Sistemas deve verificar:
-- *Application Access Policy* limitando o app à caixa remetente;
-- Licença Exchange Online ativa para o remetente;
-- Permissão `Mail.Send` consentida em nível de aplicação.
+Em caso de falha no envio, a Coordenadoria de Sistemas deve verificar:
+- conectividade do portal com o servidor SMTP (host/porta liberados em firewall);
+- autenticação da conta remetente (usuário/senha ou token);
+- política TLS exigida pelo servidor;
+- logs em **Admin → Logs → SMTP** com o motivo da rejeição.
 
 ---
 
@@ -380,11 +398,12 @@ Em caso de **erro 403 ErrorAccessDenied**, a Coordenação de Sistemas deve veri
 | **AU / PFN / PF / PBCB / QS** | Carreiras: Advogado da União, Procurador da Fazenda Nacional, Procurador Federal, Procurador do BACEN, Quadro Suplementar |
 | **SIAPE** | Sistema Integrado de Administração de Recursos Humanos |
 | **OAB** | Ordem dos Advogados do Brasil |
-| **MFA** | Multi-Factor Authentication |
-| **JIT** | Just-In-Time provisioning |
-| **Entra ID** | Microsoft Entra ID (antigo Azure AD) |
-| **AD** | Active Directory institucional |
-| **SSO** | Single Sign-On |
+| **MFA** | Multi-Factor Authentication (TOTP local — RFC 6238) |
+| **TOTP** | Time-based One-Time Password |
+| **JIT** | Just-In-Time provisioning (criação automática do perfil no 1º login) |
+| **LDAP / LDAPS** | Lightweight Directory Access Protocol (sobre TLS) |
+| **AD** | Active Directory institucional da AGU |
+| **SMTP** | Simple Mail Transfer Protocol (envio de e-mails) |
 | **SLA** | Service Level Agreement (tempo médio de análise) |
 
 ---
@@ -405,10 +424,12 @@ Acesse `/faq` no portal para a base completa e atualizada pela CGAU. Temas mais 
 
 | Sintoma | Causa provável | O que fazer |
 |---|---|---|
-| Não consigo entrar com M365 | Conta sem licença / MFA não configurado | Service Desk → `https://aka.ms/mfasetup` |
+| "Usuário ou senha inválidos" | Credencial do AD incorreta ou bloqueada | Resetar senha da Rede AGU pelos canais oficiais |
+| Código MFA recusado | Relógio do celular fora de sincronia | Ajustar data/hora automática no aparelho e tentar novamente |
+| Perdi o aplicativo autenticador | Sem acesso ao TOTP | Usar código de recuperação OU abrir chamado no Service Desk para reset do MFA |
 | Botão "Enviar" desabilitado | Declarações obrigatórias não marcadas ou campo inválido | Reveja os 4 checkboxes e os campos em vermelho |
 | Editor da grade não salva | Vigência fora do semestre | Ajuste datas dentro de 01/01–30/06 ou 01/07–31/12 |
-| Chefia não recebeu e-mail | E-mail digitado errado ou erro 403 no Graph | Abrir chamado; CGAU pode reencaminhar |
+| Chefia não recebeu e-mail | E-mail digitado errado ou falha SMTP | Abrir chamado; CGAU pode reencaminhar |
 | Recurso desabilitado | Prazo de 5 dias úteis expirado | Não há nova instância administrativa |
 | "Acesso negado" ao perfil de Coordenação | Grupo AD ausente | Solicitar inclusão em `PORTAL-MAG-CGAU` |
 | Sessão expira muito rápido | Política de inatividade (30 min) | Comportamento esperado — refaça login |
